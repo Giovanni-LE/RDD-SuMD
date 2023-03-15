@@ -13,13 +13,13 @@ import subprocess
 warnings.filterwarnings('ignore')
 
 
-
+#controllo che sia presente gromacs sulla macchina
 
 if shutil.which('gmx') is None:
     print('\n{0}\nThe program gmx is not present in the current environment\n{0}\n'.format('#'*80))
     sys.exit(10)
 
-
+#definisco le opzioni per il parsing nel caso in cui il comando venga lanciato da terminale
 def parse_options():
     parser = argparse.ArgumentParser(description='''Gromacs mdrun and grompp wrapper''')
     parser.add_argument('--pdb',
@@ -121,18 +121,20 @@ def parse_options():
 
     return args
 
+#faccio il check che la directory esista
 def check_directories(dirs):
     for dir in dirs:
         if not os.path.isdir(dir):
             print("\n\n{0}\nError! Provided directory '{1}' does not exist or is not a directory.\n{0}\n\n".format('*'*50,dir))
             sys.exit(2)
-
+#faccio il check che il file esista
 def check_files(files):
     for file in files:
         if not os.path.isfile(file):
             print("\n\n{0}\nError! Provided file '{1}' does not exist or is not a file.\n{0}\n\n".format('*'*50,file))
             sys.exit(3)
 
+#controllo che il processo sia stato eseguito correttamente
 def CheckExit(result,logpath="log.log"):
     """
     This function checks the ouput code of a subprocess call to an
@@ -148,6 +150,8 @@ with open(mdpfold+"simfile.mdp", 'w') as f:
     for key, value in mdpdict.items():
         f.write('%s=%s\n' % (key, value))
 
+
+#lancio grompp
 def g_grompp(MdpFile,,TopolFile,TprFile):
 
     process = subprocess.run(['gmx grompp','-c'',CoordFile,
@@ -159,6 +163,8 @@ def g_grompp(MdpFile,,TopolFile,TprFile):
 
 
 
+
+#lancio mdrun con o senza gpu
 def g_mdrun(TprFile=None,nsteps=None,gpu=False,cpi_file):
     if TprFile is None:
         print("\n\n provide a Tpr file")
