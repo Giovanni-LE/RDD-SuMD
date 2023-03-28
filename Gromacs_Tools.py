@@ -154,7 +154,7 @@ with open(mdpfold+"simfile.mdp", 'w') as f:
 #lancio grompp
 def g_grompp(MdpFile,,TopolFile,TprFile):
 
-    process = subprocess.run(['gmx grompp','-c'',CoordFile,
+    process = subprocess.run(['gmx grompp','-c',CoordFile,
                               '-t',TopolFile,
                               '-f',MdpFile,
                               '-o',TprFile],
