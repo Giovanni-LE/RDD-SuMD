@@ -146,13 +146,13 @@ def CheckExit(result,logpath="log.log"):
 
 
 def mdpcreator(mdpdict,mdpfold):
-with open(mdpfold+"simfile.mdp", 'w') as f:
-    for key, value in mdpdict.items():
-        f.write('%s=%s\n' % (key, value))
+    with open(mdpfold+"simfile.mdp", 'w') as f:
+        for key, value in mdpdict.items():
+            f.write('%s=%s\n' % (key, value))
 
 
 #lancio grompp
-def g_grompp(MdpFile,,TopolFile,TprFile):
+def g_grompp(MdpFile,TopolFile,Coordfile,TprFile):
 
     process = subprocess.run(['gmx grompp','-c',CoordFile,
                               '-t',TopolFile,
@@ -165,25 +165,30 @@ def g_grompp(MdpFile,,TopolFile,TprFile):
 
 
 #lancio mdrun con o senza gpu
-def g_mdrun(TprFile=None,nsteps=None,gpu=False,cpi_file):
+def g_mdrun(TprFile=None,nsteps=False,gpu=False,cpi_file=None):
+    steps=[]
     if TprFile is None:
         print("\n\n provide a Tpr file")
         return 0
+    if nsteps:
+        if nsteps is not int:
+            print("\n\n nsteps must be an integer")    
+        else:
+            steps=f"-nsteps {nsteps}"
     if gpu:
-    process = subprocess.run(['gmx mdrun','-s ',tpr,
-                                  '-o',outname,
-                                  '-nt',cpu,
-                                  '-nsteps',nsteps,
-                                  '-cpi',cpi_file,],
-                                  stdout=glog,
-                                  stderr=glog)
+        process = subprocess.run(['gmx mdrun','-s ',tpr,
+                                    '-o',outname,
+                                    '-nt',cpu,
+                                    '-cpi',cpi_file].append(step.split()),
+                                    stdout=glog,
+                                    stderr=glog)
 
     else:
-    process = subprocess.run(['gmx mdrun','-s ',tpr,
-                              '-o',outname,
-                              '-nt',cpu,
-                              '-nsteps',nsteps,
-                              '-cpi',cpi_file,
-                              '-nb gpu'],
-                              stdout=glog,
-                              stderr=glog)
+        process = subprocess.run(['gmx mdrun','-s ',tpr,
+                                '-o',outname,
+                                '-nt',cpu,
+                                '-nsteps',nsteps,
+                                '-cpi',cpi_file,
+                                '-nb gpu'],
+                                stdout=glog,
+                                stderr=glog)

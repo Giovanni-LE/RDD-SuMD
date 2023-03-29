@@ -1,0 +1,58 @@
+; GroSUMD MDP FILE FOR ENERGY MINIMIZATION
+
+; Preprocessor information: use cpp syntax.
+; e.g.: -I/home/joe/doe -I/home/mary/roe
+include                  = 
+; e.g.: -DPOSRES -DFLEXIBLE (note these variable names are case sensitive)
+define                   = 
+
+; RUN CONTROL PARAMETERS
+integrator               = steep
+nsteps                   = 10000
+emtol                    = 1000
+emstep                   = 0.01
+
+; OUTPUT CONTROL OPTIONS
+; Output frequency for coords (x), velocities (v) and forces (f)
+nstxout                  = 100
+nstvout                  = 100
+nstfout                  = 100
+; Output frequency for energies to log file and energy file
+nstlog                   = 10
+nstcalcenergy            = 10
+nstenergy                = 10
+; Output frequency and precision for .xtc file
+nstxout-compressed       = 100
+compressed-x-precision   = 1000
+; NEIGHBORSEARCHING PARAMETERS
+; cut-off scheme (Verlet: particle based cut-offs, group: using charge groups)
+cutoff-scheme            = Verlet
+; nblist update frequency
+nstlist                  = 1
+; ns algorithm (simple or grid)
+ns_type                  = grid
+; Periodic boundary conditions: xyz, no, xy
+pbc                      = xyz
+periodic-molecules       = no
+; Allowed energy error due to the Verlet buffer in kJ/mol/ps per atom,
+; a value of -1 means: use rlist
+verlet-buffer-tolerance  = 0.00000005
+; nblist cut-off        
+rlist                    = 1.1
+; long-range cut-off for switched potentials
+
+; OPTIONS FOR ELECTROSTATICS AND VDW
+; Method for doing electrostatics
+coulombtype              = pme
+coulomb-modifier         = Potential-shift-Verlet
+rcoulomb-switch          = 0.9
+rcoulomb                 = 1
+; Relative dielectric constant for the medium and the reaction field
+epsilon-r                = 1
+epsilon-rf               = 1
+; Method for doing Van der Waals
+vdwtype                  = cutoff
+vdw-modifier             = Potential-shift-Verlet
+; cut-off lengths       
+rvdw-switch              = 0.9
+rvdw                     = 1

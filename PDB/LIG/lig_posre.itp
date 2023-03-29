@@ -1,4 +1,4 @@
-; position restraints for System of LIG_GMX.gro created by acpype (v: 2022.6.6) on Thu Mar 23 15:45:10 2023
+; position restraints for System of LIG_GMX.gro created by acpype (v: 2022.6.6) on Thu Mar 30 00:04:26 2023
 
 [ position_restraints ]
 ;  i funct       fcx        fcy        fcz
