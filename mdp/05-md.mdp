@@ -9,7 +9,7 @@ define                   =
 integrator               = md
 ; timestep in ps
 dt                       = 0.002
-nsteps                   = 100000 ; 10 ns FOR RELEASE! USE 100000 FOR TESTING ONLY!
+nsteps                   = 300000 ; 10 ns FOR RELEASE! USE 100000 FOR TESTING ONLY!
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -42,7 +42,7 @@ compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
 ; default, all atoms will be written.
-compressed-x-grps        = solute
+compressed-x-grps        = system
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; cut-off scheme (Verlet: particle based cut-offs, group: using charge groups)
