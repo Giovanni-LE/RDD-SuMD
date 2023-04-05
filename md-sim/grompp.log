@@ -1,0 +1,50 @@
+                  :-) GROMACS - gmx grompp, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/desktop-tutorial
+Command line:
+  gmx grompp -c drive/MyDrive/RDD/PDB/3RFM_LIG/01-em/em.gro -r drive/MyDrive/RDD/PDB/3RFM_LIG/01-em/em.gro -p drive/MyDrive/RDD/PDB/3RFM_LIG/topol/topol_lig_posre.top -f drive/MyDrive/RDD/mdp/05-md_600.mdp -n drive/MyDrive/RDD/PDB/3RFM_LIG/index.ndx -o risultati/preliminary.tpr -maxwarn 2
+
+
+-------------------------------------------------------
+Program:     gmx grompp, version 2023-Homebrew
+Source file: src/gromacs/commandline/cmdlineparser.cpp (line 271)
+Function:    void gmx::CommandLineParser::parse(int*, char**)
+
+Error in user input:
+Invalid command-line options
+  In command-line option -c
+    File 'drive/MyDrive/RDD/PDB/3RFM_LIG/01-em/em.gro' does not exist or is
+    not accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+  In command-line option -r
+    File 'drive/MyDrive/RDD/PDB/3RFM_LIG/01-em/em.gro' does not exist or is
+    not accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+  In command-line option -p
+    File 'drive/MyDrive/RDD/PDB/3RFM_LIG/topol/topol_lig_posre.top' does not
+    exist or is not accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+  In command-line option -f
+    File 'drive/MyDrive/RDD/mdp/05-md_600.mdp' does not exist or is not
+    accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+  In command-line option -n
+    File 'drive/MyDrive/RDD/PDB/3RFM_LIG/index.ndx' does not exist or is not
+    accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at http://www.gromacs.org/Documentation/Errors
+-------------------------------------------------------
