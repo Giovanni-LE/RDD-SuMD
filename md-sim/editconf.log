@@ -1,0 +1,15 @@
+                 :-) GROMACS - gmx editconf, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx editconf -f PDB/3RFM_LIG/PROLIG_clear.gro -o risultati/md.pdb
+
+
+GROMACS reminds you: "Always code as if the person who ends up maintaining your code is a violent psychopath who knows where you live." (Martin Golding)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 4719 atoms
+Volume: 1298.3 nm^3, corresponds to roughly 584200 electrons
+Velocities found
