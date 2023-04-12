@@ -7,7 +7,7 @@ Command line:
   gmx editconf -f PDB/3RFM_LIG/04-md/md.gro -o risultati/md_.pdb
 
 
-GROMACS reminds you: "I Wrapped a Newspaper Round My Head" (F. Zappa)
+GROMACS reminds you: "The historical meaning of QM/MM: Quanto Mangi, Mamma Mia!" (Attilio Vittorio Vargiu, at BioExcel 2022 Summer School in Sardinia)
 
 Note that major changes are planned in future for editconf, to improve usability and utility.
 Read 128151 atoms
