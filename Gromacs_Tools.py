@@ -152,43 +152,44 @@ def mdpcreator(mdpdict,mdpfold):
 
 
 #lancio grompp
-def g_grompp(MdpFile,TopolFile,Coordfile,TprFile):
-
-    process = subprocess.run(['gmx grompp','-c',CoordFile,
-                              '-t',TopolFile,
+def g_grompp(MdpFile, TopolFile, CoordFile, TprFile, IndexFile, maxwarning):
+  with open('md-sim/grompp.log', 'w') as glog:
+    process = subprocess.run(['gmx' ,'grompp',
+                              '-c',CoordFile,
+                              '-r',CoordFile,
+                              '-p',TopolFile,
                               '-f',MdpFile,
-                              '-o',TprFile],
-                              stdout=glog,
-                              stderr=glog)
-
-
-
+                              '-n', IndexFile,
+                              '-o',TprFile,
+                              '-maxwarn', maxwarning],stdout=glog,stderr=glog)
 
 #lancio mdrun con o senza gpu
-def g_mdrun(TprFile=None,nsteps=False,gpu=False,cpi_file=None):
-    steps=[]
+def g_mdrun(OutputFile,xtcFile ,TprFile=None,gpu=False,cpi_file=None):
+  with open('md-sim/g_mdrun.log', 'w') as glog:
     if TprFile is None:
         print("\n\n provide a Tpr file")
         return 0
-    if nsteps:
-        if nsteps is not int:
-            print("\n\n nsteps must be an integer")    
-        else:
-            steps=f"-nsteps {nsteps}"
+
     if gpu:
-        process = subprocess.run(['gmx mdrun','-s ',tpr,
-                                    '-o',outname,
-                                    '-nt',cpu,
-                                    '-cpi',cpi_file].append(step.split()),
+        process = subprocess.run(['gmx', 'mdrun','-s',TprFile,
+                                    '-o',OutputFile,
+                                    '-x',xtcFile,
+                                    '-cpi',cpi_file,
+                                    '-nb', 'gpu'],
                                     stdout=glog,
                                     stderr=glog)
-
     else:
-        process = subprocess.run(['gmx mdrun','-s ',tpr,
-                                '-o',outname,
-                                '-nt',cpu,
-                                '-nsteps',nsteps,
+        process = subprocess.run(['gmx', 'mdrun','-s',TprFile,
+                                '-o',OutputFile,
                                 '-cpi',cpi_file,
-                                '-nb gpu'],
+                                '-nb', 'cpu'],
                                 stdout=glog,
                                 stderr=glog)
+
+#lancio editconf
+def g_editconf(f, o):
+  with open('md-sim/editconf.log', 'w') as glog:
+    process = subprocess.run(['gmx' ,'editconf',
+                              '-f',f,
+                              '-o',o,
+                              ],stdout=glog,stderr=glog)
