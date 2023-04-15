@@ -164,23 +164,30 @@ def g_grompp(MdpFile, TopolFile, CoordFile, TprFile, IndexFile, maxwarning):
                               '-maxwarn', maxwarning],stdout=glog,stderr=glog)
 
 #lancio mdrun con o senza gpu
-def g_mdrun(OutputFile,xtcFile ,TprFile=None,gpu=False,cpi_file=None):
+def g_mdrun(OutputFile, xtcFile, LogFile, EdrFile, TprFile=None,gpu=False,cpi_file=None):
   with open('md-sim/g_mdrun.log', 'w') as glog:
     if TprFile is None:
         print("\n\n provide a Tpr file")
         return 0
 
     if gpu:
-        process = subprocess.run(['gmx', 'mdrun','-s',TprFile,
+        process = subprocess.run(['gmx', 'mdrun',
+                                    '-s',TprFile,
                                     '-o',OutputFile,
                                     '-x',xtcFile,
+                                    '-g', LogFile,
+                                    '-e', EdrFile,
                                     '-cpi',cpi_file,
                                     '-nb', 'gpu'],
                                     stdout=glog,
                                     stderr=glog)
     else:
-        process = subprocess.run(['gmx', 'mdrun','-s',TprFile,
+        process = subprocess.run(['gmx', 'mdrun',
+                                '-s',TprFile,
                                 '-o',OutputFile,
+                                '-x',xtcFile,
+                                '-g', LogFile,
+                                '-e', EdrFile,
                                 '-cpi',cpi_file,
                                 '-nb', 'cpu'],
                                 stdout=glog,
