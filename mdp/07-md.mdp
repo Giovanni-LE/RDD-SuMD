@@ -117,9 +117,9 @@ ref_p                    = 1.0
 refcoord-scaling         = com
 
 ; GENERATE VELOCITIES FOR STARTUP RUN
-gen_vel                  = yes
+gen_vel                  = no
 gen-temp                 = 300
-gen-seed                 = -1
+gen-seed                 = 
 
 ; OPTIONS FOR BONDS
 constraints              = h-bonds ; coherent with Amber FFs
