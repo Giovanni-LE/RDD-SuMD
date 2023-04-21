@@ -151,56 +151,67 @@ def mdpcreator(mdpdict,mdpfold):
             f.write('%s=%s\n' % (key, value))
 
 
-#lancio grompp
+#lancio grompp 
 def g_grompp(MdpFile, TopolFile, CoordFile, TprFile, IndexFile, maxwarning):
-  with open('md-sim/grompp.log', 'w') as glog:
-    process = subprocess.run(['gmx' ,'grompp',
-                              '-c',CoordFile,
-                              '-r',CoordFile,
-                              '-p',TopolFile,
-                              '-f',MdpFile,
-                              '-n', IndexFile,
-                              '-o',TprFile,
-                              '-maxwarn', maxwarning],stdout=glog,stderr=glog)
+    """
+    Descrizione...
+    """
+    with open('md-sim/grompp.log', 'w') as glog:
+        process = subprocess.run(['gmx' ,'grompp',
+                                '-c',CoordFile,
+                                '-r',CoordFile,
+                                '-p',TopolFile,
+                                '-f',MdpFile,
+                                '-n', IndexFile,
+                                '-o',TprFile,
+                                '-maxwarn', maxwarning],stdout=glog,stderr=glog)
 
 #lancio mdrun con o senza gpu
 def g_mdrun(OutputFile, xtcFile,cpo_file, log_File, edr_File, TprFile=None,gpu=False,cpi_file=None):
-  with open('md-sim/g_mdrun.log', 'w') as glog:
-    if TprFile is None:
-        print("\n\n provide a Tpr file")
-        return 0
+    """
+    Descrizione...
+    """
 
-    if gpu:
-        process = subprocess.run(['gmx', 'mdrun',
+    with open('md-sim/g_mdrun.log', 'w') as glog:
+        if TprFile is None:
+            print("\n\n provide a Tpr file")
+            return 0
+
+        if gpu:
+            process = subprocess.run(['gmx', 'mdrun',
+                                        '-s',TprFile,
+                                        '-o',OutputFile,
+                                        '-x',xtcFile,
+                                        '-g', log_File,
+                                        '-e', edr_File,
+                                        '-cpo',cpo_file,
+                                        '-nb', 'gpu'],
+                                        stdout=glog,
+                                        stderr=glog)
+            if cpi_file is not None:
+                    cmd += ['-cpi',cpi_file]
+
+        else:
+            process = subprocess.run(['gmx', 'mdrun',
                                     '-s',TprFile,
                                     '-o',OutputFile,
                                     '-x',xtcFile,
                                     '-g', log_File,
                                     '-e', edr_File,
-                                    '-cpo',cpo_file,
-                                    '-nb', 'gpu'],
+                                    '-nb', 'cpu'],
                                     stdout=glog,
                                     stderr=glog)
-        if cpi_file is not None:
-                cmd += ['-cpi',cpi_file]
-
-    else:
-        process = subprocess.run(['gmx', 'mdrun',
-                                '-s',TprFile,
-                                '-o',OutputFile,
-                                '-x',xtcFile,
-                                '-g', log_File,
-                                '-e', edr_File,
-                                '-nb', 'cpu'],
-                                stdout=glog,
-                                stderr=glog)
-        if cpi_file is not None:
-                cmd += ['-cpi',cpi_file]
+            if cpi_file is not None:
+                    cmd += ['-cpi',cpi_file]
 
 #lancio editconf
 def g_editconf(f, o):
-  with open('md-sim/editconf.log', 'w') as glog:
-    process = subprocess.run(['gmx' ,'editconf',
-                              '-f',f,
-                              '-o',o,
-                              ],stdout=glog,stderr=glog)
+    
+    """
+    Descrizione...
+    """
+    with open('md-sim/editconf.log', 'w') as glog:
+        process = subprocess.run(['gmx' ,'editconf',
+                                '-f',f,
+                                '-o',o,
+                                ],stdout=glog,stderr=glog)
