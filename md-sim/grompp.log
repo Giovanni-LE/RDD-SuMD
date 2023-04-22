@@ -1,0 +1,44 @@
+                  :-) GROMACS - gmx grompp, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/05-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
+
+Ignoring obsolete mdp entry 'ns-type'
+Generating 1-4 interactions: fudge = 0.5
+
+NOTE 1 [file topol.top, line 44603]:
+  System has non-zero total charge: 8.000000
+  Total charge should normally be an integer. See
+  http://www.gromacs.org/Documentation/Floating_Point_Arithmetic
+  for discussion on how close it should be to an integer.
+
+
+
+Number of degrees of freedom in T-Coupling group solute is 11764.00
+
+NOTE 2 [file mdp_nowater/05-md.mdp]:
+  You are using a plain Coulomb cut-off, which might produce artifacts.
+  You might want to consider using PME electrostatics.
+
+
+
+There were 2 NOTEs
+
+GROMACS reminds you: "On average, it takes twenty years for the world's largest super computer to shrink down to the size of your laptop." (Pete Beckman)
+
+Generated 2850 of the 2850 non-bonded parameter combinations
+
+Generated 2850 of the 2850 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein'
+
+turning H bonds into constraints...
+
+Excluding 3 bonded neighbours molecule type 'LIG'
+
+turning H bonds into constraints...
+
+This run will generate roughly 17 Mb of data
