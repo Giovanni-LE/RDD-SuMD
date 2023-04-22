@@ -1,45 +1,27 @@
-                 :-) GROMACS - gmx mdrun, 2022-plumed_2.8.1 (-:
+                   :-) GROMACS - gmx mdrun, 2023-Homebrew (-:
 
-Executable:   /opt/gromacs/2022.4/bin/gmx
-Data prefix:  /opt/gromacs/2022.4
-Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
 Command line:
-  gmx mdrun -s PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.trr -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -x PDB/3RFM_LIG_NOWATER/05-md/md.xtc -g PDB/3RFM_LIG_NOWATER/05-md/md.log -e PDB/3RFM_LIG_NOWATER/05-md/md.edr -cpo PDB/3RFM_LIG_NOWATER/05-md/md.cpt -nb gpu
+  gmx mdrun -s PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.trr -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -x PDB/3RFM_LIG_NOWATER/05-md/md.xtc -g PDB/3RFM_LIG_NOWATER/05-md/md.log -e PDB/3RFM_LIG_NOWATER/05-md/md.edr -cpo PDB/3RFM_LIG_NOWATER/05-md/md.cpt -nb cpu
 
-
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.log to PDB/3RFM_LIG_NOWATER/05-md/#md.log.2#
-Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
-This run will default to '-update gpu' as requested by the GMX_FORCE_UPDATE_DEFAULT_GPU environment variable.
+Compiled SIMD: SSE4.1, but for this host/run AVX2_256 might be better (see
+log).
+Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2023-Homebrew (single precision)
 Can not increase nstlist because verlet-buffer-tolerance is not set or used
-
-1 GPU selected for this run.
-Mapping of GPU IDs to the 1 GPU task in the 1 rank on this node:
-  PP:0
-PP tasks will do (non-perturbed) short-ranged interactions on the GPU
-PP task will update and constrain coordinates on the GPU
 Using 1 MPI thread
-Using 12 OpenMP threads 
+Using 8 OpenMP threads 
 
-
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.xtc to PDB/3RFM_LIG_NOWATER/05-md/#md.xtc.2#
-
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.trr to PDB/3RFM_LIG_NOWATER/05-md/#md.trr.2#
-
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.edr to PDB/3RFM_LIG_NOWATER/05-md/#md.edr.2#
 starting mdrun 'Protein in water'
-300000 steps,    600.0 ps.
+30000 steps,     30.0 ps.
 
 Writing final coordinates.
 
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro to PDB/3RFM_LIG_NOWATER/05-md/#md_nowat.gro.2#
-
-NOTE: 15 % of the run time was spent in pair search,
-      you might want to increase nstlist (this has no effect on accuracy)
-
                Core t (s)   Wall t (s)        (%)
-       Time:     3115.328      259.611     1200.0
+       Time:     1563.982      195.499      800.0
                  (ns/day)    (hour/ns)
-Performance:      199.684        0.120
+Performance:       13.259        1.810
 
-GROMACS reminds you: "There's Nothing We Can't Fix, 'coz We Can Do It in the Mix" (Indeep)
+GROMACS reminds you: "If all else fails, immortality can always be assured by spectacular error." (John Kenneth Galbraith)
 

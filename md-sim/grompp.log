@@ -1,10 +1,10 @@
-                :-) GROMACS - gmx grompp, 2022-plumed_2.8.1 (-:
+                  :-) GROMACS - gmx grompp, 2023-Homebrew (-:
 
-Executable:   /opt/gromacs/2022.4/bin/gmx
-Data prefix:  /opt/gromacs/2022.4
-Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
 Command line:
-  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/05-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
+  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowater.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowater.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/05-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
 
 Ignoring obsolete mdp entry 'ns-type'
 Generating 1-4 interactions: fudge = 0.5
@@ -14,10 +14,10 @@ NOTE 1 [file topol.top, line 44603]:
   Total charge should normally be an integer. See
   http://www.gromacs.org/Documentation/Floating_Point_Arithmetic
   for discussion on how close it should be to an integer.
-  
 
 
-Number of degrees of freedom in T-Coupling group solute is 11764.00
+
+Number of degrees of freedom in T-Coupling group System is 11764.00
 
 NOTE 2 [file mdp_nowater/05-md.mdp]:
   You are using a plain Coulomb cut-off, which might produce artifacts.
@@ -25,11 +25,9 @@ NOTE 2 [file mdp_nowater/05-md.mdp]:
 
 
 
-There were 2 notes
+There were 2 NOTEs
 
-Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.tpr to PDB/3RFM_LIG_NOWATER/05-md/#md.tpr.2#
-
-GROMACS reminds you: "You should never bet against anything in science at odds of more than about 10^12 to 1." (Ernest Rutherford)
+GROMACS reminds you: "The future always gets twisted and turned" (Lisa o Piu)
 
 Generated 2850 of the 2850 non-bonded parameter combinations
 
@@ -43,4 +41,4 @@ Excluding 3 bonded neighbours molecule type 'LIG'
 
 turning H bonds into constraints...
 
-This run will generate roughly 17 Mb of data
+This run will generate roughly 2 Mb of data

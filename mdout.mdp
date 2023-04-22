@@ -1,17 +1,17 @@
 ;
 ;	File 'mdout.mdp' was generated
-;	By user: marcello (1000)
-;	On host: marcello-XPS-15-9570
-;	At date: Sat Apr 22 14:47:59 2023
+;	By user: root (501)
+;	On host: 192.168.1.16
+;	At date: Sat Apr 22 17:35:43 2023
 ;
 ;	Created by:
-;	               :-) GROMACS - gmx grompp, 2022-plumed_2.8.1 (-:
+;	                 :-) GROMACS - gmx grompp, 2023-Homebrew (-:
 ;	
-;	Executable:   /opt/gromacs/2022.4/bin/gmx
-;	Data prefix:  /opt/gromacs/2022.4
-;	Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+;	Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+;	Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+;	Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
 ;	Command line:
-;	  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/05-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
+;	  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowater.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowater.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/05-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -24,8 +24,8 @@ define                   =
 integrator               = md
 ; Start time and timestep in ps
 tinit                    = 0
-dt                       = 0.002
-nsteps                   = 300000
+dt                       = 0.001
+nsteps                   = 30000
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -130,18 +130,20 @@ epsilon-surface          = 0
 implicit-solvent         = no
 
 ; OPTIONS FOR WEAK COUPLING ALGORITHMS
+ensemble-temperature-setting = auto
+ensemble-temperature     = -1
 ; Temperature coupling  
 tcoupl                   = V-rescale
 nsttcouple               = -1
 nh-chain-length          = 10
 print-nose-hoover-chain-variables = no
 ; Groups to couple separately
-tc-grps                  = solute
+tc-grps                  = System
 ; Time constant (ps) and reference temperature (K)
 tau_t                    = 0.1
 ref_t                    = 300
 ; pressure coupling     
-pcoupl                   = Parrinello-Rahman
+pcoupl                   = No
 pcoupltype               = isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
