@@ -1,0 +1,17 @@
+               :-) GROMACS - gmx editconf, 2022-plumed_2.8.1 (-:
+
+Executable:   /opt/gromacs/2022.4/bin/gmx
+Data prefix:  /opt/gromacs/2022.4
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Command line:
+  gmx editconf -f PDB/3RFM_LIG/04-md/md.gro -o risultati/md_.pdb
+
+
+Back Off! I just backed up risultati/md_.pdb to risultati/#md_.pdb.2#
+
+GROMACS reminds you: "Count the Bubbles In Your Hair" (The Breeders)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 128151 atoms
+Volume: 1290.98 nm^3, corresponds to roughly 580900 electrons
+Velocities found
