@@ -303,3 +303,16 @@ Step 53601 Pressure scaling more than 1%. This may mean your system is not yet e
 Step 53701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
 
 Step 53801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Writing final coordinates.
+
+Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro to PDB/3RFM_LIG_NOWATER/05-md/#md_nowat.gro.1#
+
+               Core t (s)   Wall t (s)        (%)
+       Time:    23237.303     2904.665      800.0
+                         48:24
+                 (ns/day)    (hour/ns)
+Performance:       17.847        1.345
+
+GROMACS reminds you: "Baseball Heroes Only" (P.J. Harvey)
+
