@@ -152,25 +152,22 @@ def mdpcreator(mdpdict,mdpfold):
 
 
 #lancio grompp 
-def g_grompp(MdpFile, TopolFile, CoordFile, TprFile, IndexFile, maxwarning):
+def g_grompp(MdpFile='grompp.mdp', TopolFile='topol.top', CoordFile='conf.gro', TprFile='topol.tpr', IndexFile=0, maxwarning=0):
     """
     Descrizione...
     """
-    with open('md-sim/grompp.log', 'w') as glog:
-        process = subprocess.run(['gmx' ,'grompp',
-                                '-c',CoordFile,
-                                '-r',CoordFile,
-                                '-p',TopolFile,
-                                '-f',MdpFile,
-                                '-n', IndexFile,
-                                '-o',TprFile,
-                                '-maxwarn', maxwarning],stdout=glog,stderr=glog)
+    
+    
+
+    cmd=['gmx' ,'grompp','-c',CoordFile,'-r',CoordFile,'-p',TopolFile,'-f',MdpFile,'-n'*(IndexFile != 0), str(IndexFile)*(IndexFile!=0),'-o',TprFile,'-maxwarn', str(maxwarning)]
+    cmd=[el for el in cmd if el != '']
+    if not os.path.exists('log'):
+        os.mkdir('log')
+    with open('log/grompp.log', 'w') as glog:
+        process = subprocess.run(cmd,stdout=glog,stderr=glog)
 
 #lancio mdrun con o senza gpu
 def g_mdrun(OutputFile, xtcFile,cpo_file, log_File, edr_File, TprFile=None,gpu=False,cpi_file=None):
-    """
-    Descrizione...
-    """
 
     with open('md-sim/g_mdrun.log', 'w') as glog:
         if TprFile is None:
@@ -188,30 +185,79 @@ def g_mdrun(OutputFile, xtcFile,cpo_file, log_File, edr_File, TprFile=None,gpu=F
                                         '-nb', 'gpu'],
                                         stdout=glog,
                                         stderr=glog)
-            if cpi_file is not None:
-                    cmd += ['-cpi',cpi_file]
 
-        else:
-            process = subprocess.run(['gmx', 'mdrun',
-                                    '-s',TprFile,
-                                    '-o',OutputFile,
-                                    '-x',xtcFile,
-                                    '-g', log_File,
-                                    '-e', edr_File,
-                                    '-nb', 'cpu'],
-                                    stdout=glog,
-                                    stderr=glog)
-            if cpi_file is not None:
-                    cmd += ['-cpi',cpi_file]
 
 #lancio editconf
-def g_editconf(f, o):
+def g_editconf(f='conf.gro', o='out.gro',n=0,d='0',bt='cubic'):
     
+    h="""
+gmx editconf converts generic structure format to .gro, .g96 or .pdb.
+
+Options to specify input files:
+
+ -f      [<.gro/.g96/...>]  (conf.gro)
+           Structure file: gro g96 pdb brk ent esp tpr
+ -n      [<.ndx>]           (index.ndx)      (Opt.)
+           Index file
+ -bf     [<.dat>]           (bfact.dat)      (Opt.)
+           Generic data file
+
+Options to specify output files:
+
+ -o      [<.gro/.g96/...>]  (out.gro)        (Opt.)
+           Structure file: gro g96 pdb brk ent esp
+ -mead   [<.pqr>]           (mead.pqr)       (Opt.)
+           Coordinate file for MEAD
+
+Other options:
+ -d      <real>             (0)
+           Distance between the solute and the box
+
     """
-    Descrizione...
-    """
-    with open('md-sim/editconf.log', 'w') as glog:
-        process = subprocess.run(['gmx' ,'editconf',
-                                '-f',f,
-                                '-o',o,
-                                ],stdout=glog,stderr=glog)
+    if not os.path.exists('log'):
+        os.mkdir('log')         
+    with open('log/editconf.log', 'w') as glog:
+        cmd=['gmx' ,'editconf','-f',f,'-o',o,'-d',d,'-n'*(n != 0),str(n)*(n != 0),'-bt',bt]
+        cmd=[el for el in cmd if el != '']
+        process = subprocess.run(cmd,stdout=glog,stderr=glog)
+        #process = subprocess.run(cmd,stdout=glog,stderr=glog)
+
+
+             
+def g_insert_molecule(f='protein.gro',ci='insert.gro',o='out.gro',nmol='1',ip=0):
+    if not os.path.exists('log'):
+        os.mkdir('log')         
+    with open('log/insert-molecules.log', 'w') as glog:
+        cmd=['gmx' ,'insert-molecules','-f',f,'-ci',ci,'-o',o,'-nmol',nmol,'-ip'*(ip != 0),ip*(ip != 0)]
+        cmd=[el for el in cmd if el != '']
+        process = subprocess.run(cmd,stdout=glog,stderr=glog)    
+        
+def g_solvate(cp="protein.gro",p="topol.top",o="out.gro"):
+    if not os.path.exists('log'):
+            os.mkdir('log')         
+    with open('log/solvate.log', 'w') as glog:
+        cmd=['gmx' ,'solvate','-cp',cp,'-p',p,'-o',o]
+        cmd=[el for el in cmd if el != '']
+        process = subprocess.run(cmd,stdout=glog,stderr=glog)      
+        
+def g_genion(s="topol.tpr",p="topol.top",o="confout.gro",neutral="yes",conc=0,replace='System'):
+    if not os.path.exists('log'):
+            os.mkdir('log')         
+    with open('log/genion.log', 'w') as glog:
+        cmdecho=['echo','-e',f'{replace} \n']
+        cmd=['gmx' ,'genion','-s',s,'-p',p,'-o',o,'-neutral',neutral,'-conc'*(conc !=0),str(conc)*(conc !=0)]
+        cmd=[el for el in cmd if el != '']
+        echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
+        process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)
+            
+def g_make_ndx(f="conf.gro",n=0,o="index.ndx",Sel="\n"):
+    if not os.path.exists('log'):
+            os.mkdir('log')         
+    with open('log/make-ndx.log', 'w') as glog:
+        SELE=' \n'.join(Sel)
+        SELE=SELE+"\n q"
+        cmdecho=['echo','-e',f'{SELE} \n']
+        cmd=['gmx' ,'make_ndx','-f',f,'-o',o,'-n'*(n != 0),str(n)*(n != 0)]
+        cmd=[el for el in cmd if el != '']
+        echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
+        process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)            
