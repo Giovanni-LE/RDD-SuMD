@@ -260,4 +260,13 @@ def g_make_ndx(f="conf.gro",n=0,o="index.ndx",Sel="\n"):
         cmd=['gmx' ,'make_ndx','-f',f,'-o',o,'-n'*(n != 0),str(n)*(n != 0)]
         cmd=[el for el in cmd if el != '']
         echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
-        process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)            
+        process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)  
+
+def g_energy(f,o):
+    if not os.path.exists('log'):
+        os.mkdir('log')  
+
+    with open('log/energy.log', 'w') as glog:
+        cmd=['gmx' ,'energy','-f',f,'-o',o]
+        cmd=[el for el in cmd if el != '']
+        process = subprocess.run(cmd,stdout=glog,stderr=glog)
