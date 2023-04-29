@@ -262,11 +262,11 @@ def g_make_ndx(f="conf.gro",n=0,o="index.ndx",Sel="\n"):
         echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
         process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)  
 
-def g_pdb2gmx(pdbFile, TopolFile, groFile):
+def g_pdb2gmx(pdbFile,TopolFile, groFile,posre, ff,water):
     if not os.path.exists('log'):
         os.mkdir('log')  
 
     with open('log/pdb2gmx.log', 'w') as glog:
-        cmd=['gmx' ,'pdb2gmx','-f',pdbFile,'-o',groFile,'-p',TopolFile]
+        cmd=['gmx' ,'pdb2gmx','-f',pdbFile,'-p',TopolFile,'-o',groFile,'-i',posre ,'-ff', ff, '-water', water,'-ignh']
         cmd=[el for el in cmd if el != '']
         process = subprocess.run(cmd,stdout=glog,stderr=glog)
