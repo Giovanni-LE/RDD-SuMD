@@ -267,6 +267,6 @@ def g_pdb2gmx(pdbFile,TopolFile, groFile,posre, ff,water):
         os.mkdir('log')  
 
     with open('log/pdb2gmx.log', 'w') as glog:
-        cmd=['gmx' ,'pdb2gmx','-f',pdbFile,'-p',TopolFile,'-o',groFile,'-i',posre ,'-ff', ff, '-water', water,'-ignh']
+        cmd=['gmx' ,'pdb2gmx','-f',pdbFile,'-p',TopolFile,'-o',groFile,'-i',posre ,'-water', water,'-ff', ff,'-ignh']
         cmd=[el for el in cmd if el != '']
         process = subprocess.run(cmd,stdout=glog,stderr=glog)
