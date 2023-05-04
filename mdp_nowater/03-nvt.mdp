@@ -107,10 +107,10 @@ nsttcouple               = -1
 nh-chain-length          = 10
 print-nose-hoover-chain-variables = no
 ; Groups to couple separately
-tc-grps                  = solute solvent
+tc-grps                  = System 
 ; Time constant (ps) and reference temperature (K)
-tau_t                    = 0.1   0.1
-ref_t                    = 300   300
+tau_t                    = 0.1   
+ref_t                    = 300   
 ; pressure coupling
 pcoupl                   = no
 pcoupltype               = Isotropic
