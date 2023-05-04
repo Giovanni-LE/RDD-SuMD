@@ -157,8 +157,6 @@ def g_grompp(MdpFile='grompp.mdp', TopolFile='topol.top', CoordFile='conf.gro', 
     Descrizione...
     """
     
-    
-
     cmd=['gmx' ,'grompp','-c',CoordFile,'-r',CoordFile,'-p',TopolFile,'-f',MdpFile,'-n'*(IndexFile != 0), str(IndexFile)*(IndexFile!=0),'-o',TprFile,'-maxwarn', str(maxwarning)]
     cmd=[el for el in cmd if el != '']
     if not os.path.exists('log'):
