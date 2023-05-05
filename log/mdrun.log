@@ -1,9 +1,0 @@
-                 :-) GROMACS - gmx mdrun, 2022-plumed_2.8.1 (-:
-
-Executable:   /opt/gromacs/2022.3/bin/gmx
-Data prefix:  /opt/gromacs/2022.3
-Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
-Command line:
-  gmx mdrun -s PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.trr -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -x PDB/3RFM_LIG_NOWATER/05-md/md.xtc -g PDB/3RFM_LIG_NOWATER/05-md/md.log -e PDB/3RFM_LIG_NOWATER/05-md/md.edr -cpo PDB/3RFM_LIG_NOWATER/05-md/md.cpt -nb gpu -cpi PDB/3RFM_LIG_NOWATER/05-md/md.cpt
-
-Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
