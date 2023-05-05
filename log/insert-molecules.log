@@ -28,7 +28,7 @@ van der Waals Volumes and Radii
 J. Phys. Chem. 68 (1964) pp. 441-451
 -------- -------- --- Thank You --- -------- --------
 
-Using random seed -673185898
+Using random seed -1141244009
 Read 1 positions from file sysprep/pos.dat
 
 Try 1 success (now 4719 atoms)!
@@ -36,9 +36,7 @@ Read 1 positions from file sysprep/pos.dat
 Added 1 molecules (out of 1 requested)
 Writing generated configuration to sysprep/sys.pdb
 
-Back Off! I just backed up sysprep/sys.pdb to sysprep/#sys.pdb.5#
-
 Output configuration contains 4719 atoms in 300 residues
 
-GROMACS reminds you: "In mathematics you don't understand things, you just get used to them" (John von Neumann)
+GROMACS reminds you: "Bum Stikkie Di Bum Stikkie Di Bum Stikkie Di Bum" (R. Slijngaard)
 

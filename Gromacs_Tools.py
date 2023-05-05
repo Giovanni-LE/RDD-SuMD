@@ -184,6 +184,28 @@ def g_mdrun(OutputFile, xtcFile,cpo_file, log_File, edr_File, TprFile=None,gpu=F
                                         stdout=glog,
                                         stderr=glog)
 
+            
+            
+            
+def g_mdrunNew(s='topol.tpr',o='traj.trr', x='traj_comp.xtc',cpi=0, deffnm=0, append='yes',nb='auto',bonded='auto',cpi_file=None):
+
+    with open('md-sim/g_mdrun.log', 'w') as glog:
+        if TprFile is None:
+            print("\n\n provide a Tpr file")
+            return 0
+
+        if gpu:
+            process = subprocess.run(['gmx', 'mdrun',
+                                        '-s',s,
+                                        '-o',OutputFile,
+                                        '-x',xtcFile,
+                                        '-g', log_File,
+                                        '-e', edr_File,
+                                        '-cpo',cpo_file,
+                                        '-nb', 'gpu'],
+                                        stdout=glog,
+                                        stderr=glog)
+
 
 #lancio editconf
 def g_editconf(f='conf.gro', o='out.gro',n=0,d='0',bt='cubic'):

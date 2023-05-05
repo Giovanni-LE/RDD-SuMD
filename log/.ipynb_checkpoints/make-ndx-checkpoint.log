@@ -1,0 +1,25 @@
+               :-) GROMACS - gmx make_ndx, 2022-plumed_2.8.1 (-:
+
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Command line:
+  gmx make_ndx -f sysprep/minimization/sys.gro -o sysprep/minimization/index.ndx
+
+
+-------------------------------------------------------
+Program:     gmx make_ndx, version 2022-plumed_2.8.1
+Source file: src/gromacs/commandline/cmdlineparser.cpp (line 271)
+Function:    void gmx::CommandLineParser::parse(int*, char**)
+
+Error in user input:
+Invalid command-line options
+  In command-line option -f
+    File 'sysprep/minimization/sys.gro' does not exist or is not accessible.
+    The file could not be opened.
+      Reason: No such file or directory
+      (call to fopen() returned error code 2)
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at http://www.gromacs.org/Documentation/Errors
+-------------------------------------------------------
