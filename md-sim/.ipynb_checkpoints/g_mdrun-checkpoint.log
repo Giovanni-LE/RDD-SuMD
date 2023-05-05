@@ -1,0 +1,27 @@
+                   :-) GROMACS - gmx mdrun, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx mdrun -s PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.trr -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -x PDB/3RFM_LIG_NOWATER/05-md/md.xtc -g PDB/3RFM_LIG_NOWATER/05-md/md.log -e PDB/3RFM_LIG_NOWATER/05-md/md.edr -cpo PDB/3RFM_LIG_NOWATER/05-md/md.cpt -nb cpu
+
+Compiled SIMD: SSE4.1, but for this host/run AVX2_256 might be better (see
+log).
+Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2023-Homebrew (single precision)
+Can not increase nstlist because verlet-buffer-tolerance is not set or used
+Using 1 MPI thread
+Using 8 OpenMP threads 
+
+starting mdrun 'Protein in water'
+30000 steps,     30.0 ps.
+
+Writing final coordinates.
+
+               Core t (s)   Wall t (s)        (%)
+       Time:     1563.982      195.499      800.0
+                 (ns/day)    (hour/ns)
+Performance:       13.259        1.810
+
+GROMACS reminds you: "If all else fails, immortality can always be assured by spectacular error." (John Kenneth Galbraith)
+

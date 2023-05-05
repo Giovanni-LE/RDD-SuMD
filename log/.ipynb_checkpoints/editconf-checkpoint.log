@@ -1,0 +1,30 @@
+               :-) GROMACS - gmx editconf, 2022-plumed_2.8.1 (-:
+
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Command line:
+  gmx editconf -f PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.pdb -d 0 -bt cubic
+
+Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
+Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
+
+Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md.pdb to PDB/3RFM_LIG_NOWATER/05-md/#md.pdb.34#
+
+GROMACS reminds you: "Religion is a culture of faith; science is a culture of doubt." (Richard Feynman)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 4719 atoms
+Volume: 6806.72 nm^3, corresponds to roughly 3063000 electrons
+Velocities found
+    system size :  9.690 10.803 18.905 (nm)
+    diameter    : 18.907               (nm)
+    center      :  9.447  9.437  9.437 (nm)
+    box vectors : 18.952 18.952 18.952 (nm)
+    box angles  :  90.00  90.00  90.00 (degrees)
+    box volume  :6806.72               (nm^3)
+    shift       :  0.007  0.017  0.017 (nm)
+new center      :  9.453  9.453  9.453 (nm)
+new box vectors : 18.907 18.907 18.907 (nm)
+new box angles  :  90.00  90.00  90.00 (degrees)
+new box volume  :6758.48               (nm^3)

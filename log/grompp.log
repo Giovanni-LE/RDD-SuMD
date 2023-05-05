@@ -1,85 +1,10 @@
-                  :-) GROMACS - gmx grompp, 2023-Homebrew (-:
+                :-) GROMACS - gmx grompp, 2022-plumed_2.8.1 (-:
 
-Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
-Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
-Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
 Command line:
-  gmx grompp -c sysprep/sys.pdb -r sysprep/sys.pdb -p sysprep/topol/topol.top -f mdp_nowater/02-em.mdp -o sysprep/minimization/min.tpr -maxwarn 2
+  gmx grompp -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -r PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -p PDB/3RFM_LIG_NOWATER/topol/topol.top -f mdp_nowater/07-md.mdp -n PDB/3RFM_LIG_NOWATER/index.ndx -o PDB/3RFM_LIG_NOWATER/05-md/md.tpr -maxwarn 2
 
-Ignoring obsolete mdp entry 'ns_type'
-
-NOTE 1 [file mdp_nowater/02-em.mdp]:
-  With Verlet lists the optimal nstlist is >= 10, with GPUs >= 20. Note
-  that with the Verlet scheme, nstlist has no effect on the accuracy of
-  your simulation.
-
-
-NOTE 2 [file mdp_nowater/02-em.mdp]:
-  You have set rlist larger than the interaction cut-off, but you also have
-  verlet-buffer-tolerance > 0. Will set rlist using
-  verlet-buffer-tolerance.
-
+Ignoring obsolete mdp entry 'ns-type'
 Generating 1-4 interactions: fudge = 0.5
-
-NOTE 3 [file topol.top, line 44603]:
-  System has non-zero total charge: 8.000000
-  Total charge should normally be an integer. See
-  http://www.gromacs.org/Documentation/Floating_Point_Arithmetic
-  for discussion on how close it should be to an integer.
-
-
-
-
-WARNING 1 [file topol.top, line 44603]:
-  You are using Ewald electrostatics in a system with net charge. This can
-  lead to severe artifacts, such as ions moving into regions with low
-  dielectric, due to the uniform background charge. We suggest to
-  neutralize your system with counter ions, possibly in combination with a
-  physiological salt concentration.
-
-Setting the LD random seed to -536881410
-
-Generated 2850 of the 2850 non-bonded parameter combinations
-
-Generated 2850 of the 2850 1-4 parameter combinations
-
-Excluding 3 bonded neighbours molecule type 'Protein'
-
-Excluding 3 bonded neighbours molecule type 'LIG'
-
-++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
-J. S. Hub, B. L. de Groot, H. Grubmueller, G. Groenhof
-Quantifying Artifacts in Ewald Simulations of Inhomogeneous Systems with a Net
-Charge
-J. Chem. Theory Comput. 10 (2014) pp. 381-393
--------- -------- --- Thank You --- -------- --------
-
-Number of degrees of freedom in T-Coupling group rest is 14154.00
-The integrator does not provide a ensemble temperature, there is no system ensemble temperature
-
-NOTE 4 [file mdp_nowater/02-em.mdp]:
-  The optimal PME mesh load for parallel simulations is below 0.5
-  and for highly parallel simulations between 0.25 and 0.33,
-  for higher performance, increase the cut-off and the PME grid spacing.
-
-
-
-There were 4 NOTEs
-
-There was 1 WARNING
-
-GROMACS reminds you: "If you want to change the future, start living as if you're already there." (Lynn Conway)
-
-Analysing residue names:
-There are:   299    Protein residues
-There are:     1      Other residues
-Analysing Protein...
-Analysing residues not classified as Protein/DNA/RNA/Water and splitting into groups...
-
-The largest distance between excluded atoms is 0.418 nm between atom 2130 and 2131
-Calculating fourier grid dimensions for X Y Z
-Using a fourier grid of 160x160x160, spacing 0.118 0.118 0.118
-
-Estimate for the relative computational load of the PME mesh part: 0.97
-
-This run will generate roughly 23 Mb of data

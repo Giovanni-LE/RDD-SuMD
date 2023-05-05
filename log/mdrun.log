@@ -1,18 +1,38 @@
-                   :-) GROMACS - gmx mdrun, 2023-Homebrew (-:
+                 :-) GROMACS - gmx mdrun, 2022-plumed_2.8.1 (-:
 
-Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
-Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
-Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
 Command line:
-  gmx mdrun -s sysprep/minimization/min.tpr -o sysprep/minimization/min.trr -c sysprep/minimization/sys.gro -x -g sysprep/minimization/min.log -e sysprep/minimization/min.edr -cpo -nb cpu -cpi
+  gmx mdrun -s PDB/3RFM_LIG_NOWATER/05-md/md.tpr -o PDB/3RFM_LIG_NOWATER/05-md/md.trr -c PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro -x PDB/3RFM_LIG_NOWATER/05-md/md.xtc -g PDB/3RFM_LIG_NOWATER/05-md/md.log -e PDB/3RFM_LIG_NOWATER/05-md/md.edr -cpo PDB/3RFM_LIG_NOWATER/05-md/md.cpt -nb gpu -cpi PDB/3RFM_LIG_NOWATER/05-md/md.cpt
 
-Compiled SIMD: SSE4.1, but for this host/run AVX2_256 might be better (see
-log).
-Reading file sysprep/minimization/min.tpr, VERSION 2023-Homebrew (single precision)
+Reading file PDB/3RFM_LIG_NOWATER/05-md/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
+This run will default to '-update gpu' as requested by the GMX_FORCE_UPDATE_DEFAULT_GPU environment variable.
+Changing nstlist from 20 to 50, rlist from 1.169 to 1.374
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:0,PME:0
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the GPU
+PME tasks will do all aspects on the GPU
 Using 1 MPI thread
 Using 8 OpenMP threads 
 
+starting mdrun 'Protein in water'
+300000 steps,    600.0 ps (continuing from step 300000,    600.0 ps).
 
-Steepest Descents:
-   Tolerance (Fmax)   =  1.00000e+03
-   Number of steps    =        10000
+Writing final coordinates.
+
+Back Off! I just backed up PDB/3RFM_LIG_NOWATER/05-md/md_nowat.gro to PDB/3RFM_LIG_NOWATER/05-md/#md_nowat.gro.33#
+
+NOTE: 23 % of the run time was spent in pair search,
+      you might want to increase nstlist (this has no effect on accuracy)
+
+               Core t (s)   Wall t (s)        (%)
+       Time:        0.169        0.021      787.7
+                 (ns/day)    (hour/ns)
+Performance:        8.058        2.978
+
+GROMACS reminds you: "Somewhere, something incredible is waiting to be known." (Carl Sagan)
+

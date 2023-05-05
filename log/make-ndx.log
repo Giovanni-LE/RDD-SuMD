@@ -1,15 +1,17 @@
-                 :-) GROMACS - gmx make_ndx, 2023-Homebrew (-:
+               :-) GROMACS - gmx make_ndx, 2022-plumed_2.8.1 (-:
 
-Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
-Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
-Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
 Command line:
   gmx make_ndx -f sysprep/minimization/sys.gro -o sysprep/minimization/index.ndx
 
 
 Reading structure file
 
-GROMACS reminds you: "In the processing of models we must be especially cautious of the human weakness to think that models can be verified or validated. Especially one's own." (Roald Hoffmann)
+Back Off! I just backed up sysprep/minimization/index.ndx to sysprep/minimization/#index.ndx.5#
+
+GROMACS reminds you: "In mathematics you don't understand things, you just get used to them" (John von Neumann)
 
 Going to read 0 old index file(s)
 Analysing residue names:
@@ -42,7 +44,27 @@ Analysing residues not classified as Protein/DNA/RNA/Water and splitting into gr
 
 > 
 
-Syntax error: "-e "
+  0 System              :  4719 atoms
+  1 Protein             :  4695 atoms
+  2 Protein-H           :  2315 atoms
+  3 C-alpha             :   299 atoms
+  4 Backbone            :   897 atoms
+  5 MainChain           :  1197 atoms
+  6 MainChain+Cb        :  1479 atoms
+  7 MainChain+H         :  1486 atoms
+  8 SideChain           :  3209 atoms
+  9 SideChain-H         :  1118 atoms
+ 10 Prot-Masses         :  4695 atoms
+ 11 non-Protein         :    24 atoms
+ 12 Other               :    24 atoms
+ 13 LIG                 :    24 atoms
+
+ nr : group      '!': not  'name' nr name   'splitch' nr    Enter: list groups
+ 'a': atom       '&': and  'del' nr         'splitres' nr   'l': list residues
+ 't': atom type  '|': or   'keep' nr        'splitat' nr    'h': help
+ 'r': residue              'res' nr         'chain' char
+ "name": group             'case': case sensitive           'q': save and quit
+ 'ri': residue index
 
 > 
 

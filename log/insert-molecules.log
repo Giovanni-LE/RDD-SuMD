@@ -1,8 +1,8 @@
-             :-) GROMACS - gmx insert-molecules, 2023-Homebrew (-:
+           :-) GROMACS - gmx insert-molecules, 2022-plumed_2.8.1 (-:
 
-Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
-Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
-Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
 Command line:
   gmx insert-molecules -f sysprep/tmp.box.pdb -ci PDB/LIG/LIG.pdb -o sysprep/sys.pdb -nmol 1 -ip sysprep/pos.dat
 
@@ -28,7 +28,7 @@ van der Waals Volumes and Radii
 J. Phys. Chem. 68 (1964) pp. 441-451
 -------- -------- --- Thank You --- -------- --------
 
-Using random seed -406978929
+Using random seed -673185898
 Read 1 positions from file sysprep/pos.dat
 
 Try 1 success (now 4719 atoms)!
@@ -36,7 +36,9 @@ Read 1 positions from file sysprep/pos.dat
 Added 1 molecules (out of 1 requested)
 Writing generated configuration to sysprep/sys.pdb
 
+Back Off! I just backed up sysprep/sys.pdb to sysprep/#sys.pdb.5#
+
 Output configuration contains 4719 atoms in 300 residues
 
-GROMACS reminds you: "If you want to change the future, start living as if you're already there." (Lynn Conway)
+GROMACS reminds you: "In mathematics you don't understand things, you just get used to them" (John von Neumann)
 

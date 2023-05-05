@@ -1,0 +1,24 @@
+                 :-) GROMACS - gmx mdrun, 2022-plumed_2.8.1 (-:
+
+Executable:   /opt/gromacs/2022.3/bin/gmx
+Data prefix:  /opt/gromacs/2022.3
+Working dir:  /home/marcello/Documenti/GitHub/RDD-SuMD
+Command line:
+  gmx mdrun -s sysprep/equilibration/md.tpr -o sysprep/equilibration/md.trr -c sysprep/equilibration/sys.gro -x -g sysprep/equilibration/md.log -e sysprep/equilibration/md.edr -cpo -nb gpu -cpi
+
+Reading file sysprep/equilibration/md.tpr, VERSION 2022-plumed_2.8.1 (single precision)
+This run will default to '-update gpu' as requested by the GMX_FORCE_UPDATE_DEFAULT_GPU environment variable.
+Changing nstlist from 20 to 50, rlist from 1.169 to 1.374
+
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:0,PME:0
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the GPU
+PME tasks will do all aspects on the GPU
+Using 1 MPI thread
+Using 8 OpenMP threads 
+
+starting mdrun 'Protein in water'
+300000 steps,    600.0 ps.
