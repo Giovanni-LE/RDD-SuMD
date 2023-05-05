@@ -1,0 +1,26 @@
+                 :-) GROMACS - gmx editconf, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx editconf -f PDB/3RFM/0_sys/3RFM.gro -o sysprep/tmp.box.pdb -d 5 -bt cubic
+
+
+GROMACS reminds you: "If you want to change the future, start living as if you're already there." (Lynn Conway)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 4695 atoms
+Volume: 210.248 nm^3, corresponds to roughly 94600 electrons
+No velocities found
+    system size :  7.871  5.635  4.741 (nm)
+    diameter    :  8.952               (nm)
+    center      :  2.301 -3.144 -2.905 (nm)
+    box vectors :  7.871  5.634  4.741 (nm)
+    box angles  :  90.00  90.00  90.00 (degrees)
+    box volume  : 210.25               (nm^3)
+    shift       :  7.175 12.619 12.381 (nm)
+new center      :  9.476  9.476  9.476 (nm)
+new box vectors : 18.952 18.952 18.952 (nm)
+new box angles  :  90.00  90.00  90.00 (degrees)
+new box volume  :6806.71               (nm^3)

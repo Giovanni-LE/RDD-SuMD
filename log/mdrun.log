@@ -1,0 +1,18 @@
+                   :-) GROMACS - gmx mdrun, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx mdrun -s sysprep/minimization/min.tpr -o sysprep/minimization/min.trr -c sysprep/minimization/sys.gro -x -g sysprep/minimization/min.log -e sysprep/minimization/min.edr -cpo -nb cpu -cpi
+
+Compiled SIMD: SSE4.1, but for this host/run AVX2_256 might be better (see
+log).
+Reading file sysprep/minimization/min.tpr, VERSION 2023-Homebrew (single precision)
+Using 1 MPI thread
+Using 8 OpenMP threads 
+
+
+Steepest Descents:
+   Tolerance (Fmax)   =  1.00000e+03
+   Number of steps    =        10000
