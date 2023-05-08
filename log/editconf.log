@@ -1,0 +1,28 @@
+                 :-) GROMACS - gmx editconf, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx editconf -f sumd/undefined_simulation/md.tpr -o sumd/undefined_simulation/md.pdb -d 0 -bt cubic
+
+Reading file sumd/undefined_simulation/md.tpr, VERSION 2023-Homebrew (single precision)
+Reading file sumd/undefined_simulation/md.tpr, VERSION 2023-Homebrew (single precision)
+
+GROMACS reminds you: "And after some more talk we agreed that the wisdom of rats had been grossly overrated, being in fact no greater than that of men" (Joseph Conrad)
+
+Note that major changes are planned in future for editconf, to improve usability and utility.
+Read 4719 atoms
+Volume: 6806.72 nm^3, corresponds to roughly 3063000 electrons
+Velocities found
+    system size : 12.345  9.046  7.084 (nm)
+    diameter    : 14.796               (nm)
+    center      :  9.528  9.430  9.438 (nm)
+    box vectors : 18.952 18.952 18.952 (nm)
+    box angles  :  90.00  90.00  90.00 (degrees)
+    box volume  :6806.72               (nm^3)
+    shift       : -2.130 -2.032 -2.040 (nm)
+new center      :  7.398  7.398  7.398 (nm)
+new box vectors : 14.796 14.796 14.796 (nm)
+new box angles  :  90.00  90.00  90.00 (degrees)
+new box volume  :3239.47               (nm^3)

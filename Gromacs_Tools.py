@@ -123,12 +123,20 @@ def parse_options():
 
 #faccio il check che la directory esista
 def check_directories(dirs):
+
+    h="""
+    This function checks if the directory exist or is not a directory
+    """
     for dir in dirs:
         if not os.path.isdir(dir):
             print("\n\n{0}\nError! Provided directory '{1}' does not exist or is not a directory.\n{0}\n\n".format('*'*50,dir))
             sys.exit(2)
 #faccio il check che il file esista
 def check_files(files):
+
+    h="""
+    This function checks if the file exist or is not a file
+    """
     for file in files:
         if not os.path.isfile(file):
             print("\n\n{0}\nError! Provided file '{1}' does not exist or is not a file.\n{0}\n\n".format('*'*50,file))
@@ -153,9 +161,44 @@ def mdpcreator(mdpdict,mdpfold):
 
 #lancio grompp 
 def g_grompp(MdpFile='grompp.mdp', TopolFile='topol.top', CoordFile='conf.gro', TprFile='topol.tpr', IndexFile=0, maxwarning=0):
-    """
-    Descrizione...
-    """
+      
+    h="""
+GMX GROMPP
+    Gmx Grompp  (the gromacs preprocessor) 
+    reads a molecular topology file, checks the validity of the file,
+    expands the topology 
+    from a molecular description to an atomic description.
+
+
+Options to specify input files:
+            
+-CoordFile [<.gro/.g96/…>] (conf.gro)
+    Structure file: gro g96 pdb brk ent esp tpr
+
+-CoordFile [<.gro/.g96/…>] (restraint.gro) (Optional)
+    Structure file: gro g96 pdb brk ent esp tpr
+
+-TopolFile [<.top>] (topol.top)
+    Topology file
+
+-MdpFile [<.mdp>] (grompp.mdp)
+    grompp input file with MD parameters
+
+-IndexFile [<.ndx>] (index.ndx) (Optional)
+    Index file
+
+
+Options to specify output files:
+
+-TprFile [<.tpr>] (topol.tpr)
+    Portable xdr run input file
+
+
+Other options:
+
+-maxwarn <int> (0)
+    Number of allowed warnings during input processing. Not for normal use and may generate unstable systems 
+"""
     
     cmd=['gmx' ,'grompp','-c',CoordFile,'-r',CoordFile,'-p',TopolFile,'-f',MdpFile,'-n'*(IndexFile != 0), str(IndexFile)*(IndexFile!=0),'-o',TprFile,'-maxwarn', str(maxwarning)]
     cmd=[el for el in cmd if el != '']
@@ -164,54 +207,78 @@ def g_grompp(MdpFile='grompp.mdp', TopolFile='topol.top', CoordFile='conf.gro', 
     with open('log/grompp.log', 'w') as glog:
         process = subprocess.run(cmd,stdout=glog,stderr=glog)
 
-#lancio mdrun con o senza gpu
-def g_mdrun(OutputFile, xtcFile,cpo_file, log_File, edr_File, TprFile=None,gpu=False,cpi_file=None):
 
-    with open('md-sim/g_mdrun.log', 'w') as glog:
-        if TprFile is None:
-            print("\n\n provide a Tpr file")
-            return 0
+       
+def g_mdrun(OutputFile, xtcFile, log_File, edr_File,groFile, TprFile=None,gpu=False,append=False):
 
-        if gpu:
-            process = subprocess.run(['gmx', 'mdrun',
-                                        '-s',TprFile,
-                                        '-o',OutputFile,
-                                        '-x',xtcFile,
-                                        '-g', log_File,
-                                        '-e', edr_File,
-                                        '-cpo',cpo_file,
-                                        '-nb', 'gpu'],
-                                        stdout=glog,
-                                        stderr=glog)
+  h="""
+GMX MDRUN
+    GMX MDRUN gromacs command is used to perform molecular dynamics (MD) in the ) in gromacs simulations.
+    MD is a molecular modelling simulation technique to study the behaviour of molecular systems under different conditions, such as such as temperature, pressure, density and composition
 
-            
-            
-            
-def g_mdrunNew(s='topol.tpr',o='traj.trr', x='traj_comp.xtc',cpi=0, deffnm=0, append='yes',nb='auto',bonded='auto',cpi_file=None):
+Options to specify input files:
 
-    with open('md-sim/g_mdrun.log', 'w') as glog:
-        if TprFile is None:
-            print("\n\n provide a Tpr file")
-            return 0
+-TprFile [<.tpr>] (topol.tpr)
+    Portable xdr run input file
 
-        if gpu:
-            process = subprocess.run(['gmx', 'mdrun',
-                                        '-s',s,
-                                        '-o',OutputFile,
-                                        '-x',xtcFile,
-                                        '-g', log_File,
-                                        '-e', edr_File,
-                                        '-cpo',cpo_file,
-                                        '-nb', 'gpu'],
-                                        stdout=glog,
-                                        stderr=glog)
+-cpi_file [<.cpt>] (state.cpt) (Optional)
+     Checkpoint file
+
+
+Options to specify output files:
+
+-OutputFile [<.trr/.cpt/…>] (traj.trr)
+     Full precision trajectory: trr cpt tng
+
+-xtcFile [<.xtc/.tng>] (traj_comp.xtc) (Optional)
+        Compressed trajectory (tng format or portable xdr format)
+
+-cpo_file [<.cpt>] (state.cpt) (Optional)
+        Checkpoint file
+
+-edr_File [<.edr>] (ener.edr)
+        Energy file
+
+-log_File [<.log>] (md.log)
+        Log file
+
+
+Other options:
+
+ -'gpu' <enum> (auto)
+        Calculate non-bonded interactions on: auto, cpu, gpu
+
+-[no]append (yes)
+        Append to previous output files when continuing from checkpoint instead of adding the simulation part number to all file names
+ """
+  if not os.path.exists('log'):
+      os.mkdir('log')
+  with open('log/mdrun.log', 'w') as glog:
+    if TprFile is None:
+      print("\n\n provide a Tpr file")
+      return 0
+
+    if append == True:
+      append = '-append'
+
+    if gpu:
+      cmd = ['gmx', 'mdrun','-s',TprFile,'-o',OutputFile,'-c',groFile,'-x',xtcFile,'-g', log_File,'-e', edr_File,'-nb', 'gpu']
+    else:
+      cmd = ['gmx', 'mdrun','-s',TprFile,'-o',OutputFile,'-c',groFile,'-x',xtcFile,'-g', log_File,'-e', edr_File,'-nb', 'cpu']
+
+    if append == '-append':
+      cmd += [append]
+
+    cmd=[el for el in cmd if el != '']
+    process = subprocess.run(cmd,stdout=glog,stderr=glog)           
 
 
 #lancio editconf
 def g_editconf(f='conf.gro', o='out.gro',n=0,d='0',bt='cubic'):
     
     h="""
-gmx editconf converts generic structure format to .gro, .g96 or .pdb.
+Gmx Editconf 
+Gmx editconf converts generic structure format to .gro, .g96 or .pdb.
 
 Options to specify input files:
 
@@ -232,7 +299,6 @@ Options to specify output files:
 Other options:
  -d      <real>             (0)
            Distance between the solute and the box
-
     """
     if not os.path.exists('log'):
         os.mkdir('log')         
@@ -245,22 +311,118 @@ Other options:
 
              
 def g_insert_molecule(f='protein.gro',ci='insert.gro',o='out.gro',nmol='1',ip=0):
+
+    h="""
+GMX INSERT-MOLECULE
+    Gmx insert molecule inserts -nmol copies of the system specified in the -ci input file.
+        The insertions take place either into vacant space in the solute conformation given with -f, 
+        or into an empty box given by -box. Specifying both -f and -box behaves like -f, 
+        but places a new box around the solute before insertions. Any velocities present are discarded.
+
+Options to specify input files:
+
+-f [<.gro/.g96/…>] (protein.gro) (Optional)
+    Existing configuration to insert into: gro g96 pdb brk ent esp tpr
+
+-ci [<.gro/.g96/…>] (insert.gro)
+    Configuration to insert: gro g96 pdb brk ent esp tpr
+
+-ip [<.dat>] (positions.dat) (Optional)
+    Predefined insertion trial positions
+
+
+Options to specify output files:
+
+-o [<.gro/.g96/…>] (out.gro)
+    Output configuration after insertion: gro g96 pdb brk ent esp
+
+
+Other options:
+
+-nmol <int> (0)
+    Number of extra molecules to insert
+    """
     if not os.path.exists('log'):
         os.mkdir('log')         
     with open('log/insert-molecules.log', 'w') as glog:
         cmd=['gmx' ,'insert-molecules','-f',f,'-ci',ci,'-o',o,'-nmol',nmol,'-ip'*(ip != 0),ip*(ip != 0)]
         cmd=[el for el in cmd if el != '']
         process = subprocess.run(cmd,stdout=glog,stderr=glog)    
+
         
 def g_solvate(cp="protein.gro",p="topol.top",o="out.gro"):
+
+    h="""
+GMX SOLVATE
+    Gmx Solvate generate a box of solvent. Specify -cs and -box. Or specify -cs and -cp with a structure file with a box, but without atoms.
+
+
+Options to specify input files:
+
+-cp [<.gro/.g96/…>] (protein.gro) (Optional)
+    Structure file: gro g96 pdb brk ent esp tpr
+
+
+Options to specify input/output files:
+
+-p [<.top>] (topol.top) (Optional)
+    Topology file
+
+
+Options to specify output files:
+
+-o [<.gro/.g96/…>] (out.gro)
+    Structure file: gro g96 pdb brk ent esp
+    """
+
     if not os.path.exists('log'):
             os.mkdir('log')         
     with open('log/solvate.log', 'w') as glog:
         cmd=['gmx' ,'solvate','-cp',cp,'-p',p,'-o',o]
         cmd=[el for el in cmd if el != '']
         process = subprocess.run(cmd,stdout=glog,stderr=glog)      
+
+
         
 def g_genion(s="topol.tpr",p="topol.top",o="confout.gro",neutral="yes",conc=0,replace='System'):
+
+    h="""
+GMX GENION
+    Gmx genion randomly replaces solvent molecules with monoatomic ions. 
+    The group of solvent molecules should be continuous and all molecules should have the same number of atoms. 
+    The user should add the ion molecules to the topology file or use the -p option to automatically modify the topology.
+
+Options to specify input files:
+
+-s [<.tpr>] (topol.tpr)
+    Portable xdr run input file
+
+
+
+Options to specify input/output files:
+
+-p [<.top>] (topol.top) (Optional)
+    Topology file
+
+
+Options to specify output files:
+
+-o [<.gro/.g96/…>] (out.gro)
+    Structure file: gro g96 pdb brk ent esp
+
+
+
+Other options:
+
+-conc <real> (0)
+    Specify salt concentration (mol/liter). 
+    This will add sufficient ions to reach up to the specified concentration as computed from the volume of the cell in the input .tpr file.
+    Overrides the -np and -nn options.
+
+-[no]neutral (no)
+    This option will add enough ions to neutralize the system. These ions are added on top of those specified with -np/-nn or -conc.
+"""
+
     if not os.path.exists('log'):
             os.mkdir('log')         
     with open('log/genion.log', 'w') as glog:
@@ -270,7 +432,33 @@ def g_genion(s="topol.tpr",p="topol.top",o="confout.gro",neutral="yes",conc=0,re
         echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
         process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)
             
+
+
 def g_make_ndx(f="conf.gro",n=0,o="index.ndx",Sel="\n"):
+
+    h="""
+GMX MAKE NDX
+    You ONLY have to use gmx make_ndx when you need SPECIAL index groups. 
+    There is a default index group for the whole system, 9 default index groups for proteins, 
+    and a default index group is generated for every other residue name.
+    When no index file is supplied, also gmx make_ndx will generate the default groups. 
+    With the index editor you can select on atom, residue and chain names and numbers.
+
+
+Options to specify input files:
+
+-f [<.gro/.g96/…>] (conf.gro) (Optional)
+    Structure file: gro g96 pdb brk ent esp tpr
+
+-n [<.ndx> […]] (index.ndx) (Optional)
+    Index file
+
+
+Options to specify output files:
+
+-o [<.ndx>] (index.ndx)
+    Index file
+"""
     if not os.path.exists('log'):
             os.mkdir('log')         
     with open('log/make-ndx.log', 'w') as glog:
@@ -282,7 +470,46 @@ def g_make_ndx(f="conf.gro",n=0,o="index.ndx",Sel="\n"):
         echo = subprocess.Popen(cmdecho, stdout=subprocess.PIPE)
         process = subprocess.run(cmd,stdout=glog,stderr=glog,stdin=echo.stdout)  
 
+
+
 def g_pdb2gmx(pdbFile,TopolFile, groFile,posre, ff,water):
+
+    h="""
+GMX pdb2gmx 
+    reads a .pdb (or .gro) file, reads some database files, 
+    adds hydrogens to the molecules and generates coordinates in GROMACS (GROMOS), 
+    or optionally .pdb, format and a topology in GROMACS format. 
+    These files can subsequently be processed to generate a run input file.
+  
+
+
+Options to specify input files:
+
+-pdbFile [<.gro/.g96/…>] (conf.gro) (Optional)
+    Structure file: gro g96 pdb brk ent esp tpr
+
+
+
+Options to specify output files:
+
+-groFile [<.gro/.g96/…>] (conf.gro)
+    Structure file: gro g96 pdb brk ent esp
+
+-TopolFile [<.top>] (topol.top)
+    Topology file
+
+-posre [<.itp>] (posre.itp)
+    Include file for topology
+
+
+Other options:
+
+-ignh <string> (select)
+    Force field, interactive by default. Use -h for information.
+
+-water <enum> (select)
+    Water model to use: select, none, spc, spce, tip3p, tip4p, tip5p, tips3p
+"""
     if not os.path.exists('log'):
         os.mkdir('log')  
 

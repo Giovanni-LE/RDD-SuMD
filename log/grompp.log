@@ -1,0 +1,44 @@
+                  :-) GROMACS - gmx grompp, 2023-Homebrew (-:
+
+Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
+Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
+Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
+Command line:
+  gmx grompp -c sumd/actual_simulation/md.gro -r sumd/actual_simulation/md.gro -p sumd/sysprep/topol/topol.top -f mdp_nowater_acorciata/07-md.mdp -n sumd/sysprep/minimization/index.ndx -o sumd/undefined_simulation/md.tpr -maxwarn 2
+
+Ignoring obsolete mdp entry 'ns-type'
+Generating 1-4 interactions: fudge = 0.5
+
+NOTE 1 [file topol.top, line 44603]:
+  System has non-zero total charge: 8.000000
+  Total charge should normally be an integer. See
+  http://www.gromacs.org/Documentation/Floating_Point_Arithmetic
+  for discussion on how close it should be to an integer.
+
+
+
+Number of degrees of freedom in T-Coupling group System is 11764.00
+
+NOTE 2 [file mdp_nowater_acorciata/07-md.mdp]:
+  You are using a plain Coulomb cut-off, which might produce artifacts.
+  You might want to consider using PME electrostatics.
+
+
+
+There were 2 NOTEs
+
+GROMACS reminds you: "If you want to change the future, start living as if you're already there." (Lynn Conway)
+
+Generated 2850 of the 2850 non-bonded parameter combinations
+
+Generated 2850 of the 2850 1-4 parameter combinations
+
+Excluding 3 bonded neighbours molecule type 'Protein'
+
+turning H bonds into constraints...
+
+Excluding 3 bonded neighbours molecule type 'LIG'
+
+turning H bonds into constraints...
+
+This run will generate roughly 1 Mb of data
