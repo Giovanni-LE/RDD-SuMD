@@ -9,7 +9,7 @@ define                   =
 integrator               = md
 ; timestep in ps
 dt                       = 0.001
-nsteps                   = 30000 ; 10 ns FOR RELEASE! USE 100000 FOR TESTING ONLY!
+nsteps                   = 300000 ; 10 ns FOR RELEASE! USE 100000 FOR TESTING ONLY!
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
