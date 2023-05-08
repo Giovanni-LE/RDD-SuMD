@@ -4,14 +4,13 @@ Executable:   /usr/local/bin/../Cellar/gromacs/2023/bin/gmx
 Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
 Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
 Command line:
-  gmx mdrun -s sumd/undefined_simulation/md.tpr -o sumd/undefined_simulation/md.trr -c sumd/undefined_simulation/md.gro -x sumd/undefined_simulation/md.xtc -g sumd/undefined_simulation/md.log -e sumd/undefined_simulation/md.edr -nb cpu -append
+  gmx mdrun -s sumd/sysprep/equilibration/md.tpr -o sumd/sysprep/equilibration/md.trr -c sumd/sysprep/equilibration/md.gro -x -g sumd/sysprep/equilibration/md.log -e sumd/sysprep/equilibration/md.edr -nb cpu
 
 Compiled SIMD: SSE4.1, but for this host/run AVX2_256 might be better (see
 log).
-Reading file sumd/undefined_simulation/md.tpr, VERSION 2023-Homebrew (single precision)
-Can not increase nstlist because verlet-buffer-tolerance is not set or used
+Reading file sumd/sysprep/equilibration/md.tpr, VERSION 2023-Homebrew (single precision)
 Using 1 MPI thread
 Using 8 OpenMP threads 
 
 starting mdrun 'Protein in water'
-9000 steps,     18.0 ps.
+10000 steps,     20.0 ps.

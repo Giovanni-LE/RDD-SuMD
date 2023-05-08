@@ -28,7 +28,7 @@ van der Waals Volumes and Radii
 J. Phys. Chem. 68 (1964) pp. 441-451
 -------- -------- --- Thank You --- -------- --------
 
-Using random seed -1073875056
+Using random seed -1145135233
 Read 1 positions from file sumd/sysprep/pos.dat
 
 Try 1 success (now 4719 atoms)!
@@ -36,9 +36,7 @@ Read 1 positions from file sumd/sysprep/pos.dat
 Added 1 molecules (out of 1 requested)
 Writing generated configuration to sumd/sysprep/sys.pdb
 
-Back Off! I just backed up sumd/sysprep/sys.pdb to sumd/sysprep/#sys.pdb.2#
-
 Output configuration contains 4719 atoms in 300 residues
 
-GROMACS reminds you: "Look, I don't want to compete, so let's divide up physics between us. I'll take auroras and you take the rest of the universe." (Joan Feynman to her brother Richard)
+GROMACS reminds you: "Just Give Me a Blip" (F. Black)
 

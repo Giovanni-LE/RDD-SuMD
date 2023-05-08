@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: root (501)
 ;	On host: mac-giovanni.homenet.telecomitalia.it
-;	At date: Mon May  8 20:12:14 2023
+;	At date: Mon May  8 23:00:05 2023
 ;
 ;	Created by:
 ;	                 :-) GROMACS - gmx grompp, 2023-Homebrew (-:
@@ -11,21 +11,21 @@
 ;	Data prefix:  /usr/local/bin/../Cellar/gromacs/2023
 ;	Working dir:  /Users/giovanni_buonfrate/Documents/GitHub/RDD-SuMD
 ;	Command line:
-;	  gmx grompp -c sumd/actual_simulation/md.gro -r sumd/actual_simulation/md.gro -p sumd/sysprep/topol/topol.top -f mdp_nowater_acorciata/07-md.mdp -n sumd/sysprep/minimization/index.ndx -o sumd/undefined_simulation/md.tpr -maxwarn 2
+;	  gmx grompp -c sumd/sysprep/minimization/min.gro -r sumd/sysprep/minimization/min.gro -p sumd/sysprep/topol/topol.top -f mdp_nowater_acorciata/03-nvt.mdp -n sumd/sysprep/minimization/index.ndx -o sumd/sysprep/equilibration/md.tpr -maxwarn 2
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
 ; e.g.: -I/home/joe/doe -I/home/mary/roe
 include                  = 
 ; e.g.: -DPOSRES -DFLEXIBLE (note these variable names are case sensitive)
-define                   = 
+define                   = -DPOSRES
 
 ; RUN CONTROL PARAMETERS
 integrator               = md
 ; Start time and timestep in ps
 tinit                    = 0
 dt                       = 0.002
-nsteps                   = 9000
+nsteps                   = 10000
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -35,7 +35,7 @@ mts                      = no
 ; mode for center of mass motion removal
 comm-mode                = Linear
 ; number of steps for center of mass motion removal
-nstcomm                  = 100
+nstcomm                  = 1
 ; group(s) for center of mass motion removal
 comm-grps                = System
 
@@ -63,13 +63,13 @@ rtpi                     = 0.05
 ; Output frequency for coords (x), velocities (v) and forces (f)
 nstxout                  = 50000
 nstvout                  = 50000
-nstfout                  = 50000
+nstfout                  = 0
 ; Output frequency for energies to log file and energy file
-nstlog                   = 500
-nstcalcenergy            = 100
-nstenergy                = 500
+nstlog                   = 2500
+nstcalcenergy            = 2500
+nstenergy                = 2500
 ; Output frequency and precision for .xtc file
-nstxout-compressed       = 500
+nstxout-compressed       = 2500
 compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
@@ -88,20 +88,20 @@ pbc                      = xyz
 periodic-molecules       = no
 ; Allowed energy error due to the Verlet buffer in kJ/mol/ps per atom,
 ; a value of -1 means: use rlist
-verlet-buffer-tolerance  = -1
+verlet-buffer-tolerance  = 0.00000005
 ; nblist cut-off        
 rlist                    = 1.1
 ; long-range cut-off for switched potentials
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
 ; Method for doing electrostatics
-coulombtype              = cut-off
-coulomb-modifier         = Potential-shift
+coulombtype              = pme
+coulomb-modifier         = Potential-shift-Verlet
 rcoulomb-switch          = 0.9
 rcoulomb                 = 1
 ; Relative dielectric constant for the medium and the reaction field
-epsilon_r                = 1
-epsilon_rf               = 1
+epsilon-r                = 1
+epsilon-rf               = 1
 ; Method for doing Van der Waals
 vdw-type                 = cut-off
 vdw-modifier             = Potential-shift-Verlet
@@ -115,13 +115,13 @@ table-extension          = 1
 ; Separate tables between energy group pairs
 energygrp-table          = 
 ; Spacing for the PME/PPPM FFT grid
-fourierspacing           = 0.12
+fourierspacing           = 0.16
 ; FFT grid size, when a value is 0 fourierspacing will be used
 fourier-nx               = 0
 fourier-ny               = 0
 fourier-nz               = 0
 ; EWALD/PME/PPPM parameters
-pme-order                = 4
+pme_order                = 4
 ewald-rtol               = 1e-05
 ewald-rtol-lj            = 0.001
 lj-pme-comb-rule         = Geometric
@@ -144,14 +144,14 @@ tau_t                    = 0.1
 ref_t                    = 300
 ; pressure coupling     
 pcoupl                   = no
-pcoupltype               = isotropic
+pcoupltype               = Isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
-tau_p                    = 5.0
-compressibility          = 4.5e-5
-ref_p                    = 1.0
+tau-p                    = 1
+compressibility          = 4.5e-5 4.5e-5 0 0 0 0
+ref-p                    = 1.0
 ; Scaling of reference coordinates, No, All or COM
-refcoord-scaling         = com
+refcoord-scaling         = No
 
 ; OPTIONS FOR QMMM calculations
 QMMM                     = no
@@ -169,9 +169,9 @@ annealing-time           =
 annealing-temp           = 
 
 ; GENERATE VELOCITIES FOR STARTUP RUN
-gen_vel                  = no
-gen-temp                 = 300
-gen-seed                 = -1678254761
+gen_vel                  = yes
+gen_temp                 = 300
+gen_seed                 = -545267714
 
 ; OPTIONS FOR BONDS    
 constraints              = h-bonds
@@ -184,11 +184,11 @@ Shake-SOR                = no
 ; Relative tolerance of shake
 shake-tol                = 0.0001
 ; Highest order in the expansion of the constraint coupling matrix
-lincs-order              = 4
+lincs_order              = 4
 ; Number of iterations in the final step of LINCS. 1 is fine for
 ; normal simulations, but use 2 to conserve energy in NVE runs.
 ; For energy minimization with constraints it should be 4 to 8.
-lincs-iter               = 1
+lincs_iter               = 1
 ; Lincs will write a warning to the stderr if in one step a bond
 ; rotates over more degrees than
 lincs-warnangle          = 30
