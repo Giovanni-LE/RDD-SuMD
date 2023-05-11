@@ -43,7 +43,7 @@ compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
 ; default, all atoms will be written.
-compressed-x-grps        = solute
+compressed-x-grps        = System
 ; Selection of energy groups
 energygrps               =
 

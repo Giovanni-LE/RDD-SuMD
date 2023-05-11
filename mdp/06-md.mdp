@@ -42,7 +42,7 @@ compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
 ; default, all atoms will be written.
-compressed-x-grps        = system
+compressed-x-grps        = System
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; cut-off scheme (Verlet: particle based cut-offs, group: using charge groups)
@@ -126,7 +126,7 @@ constraints              = h-bonds ; coherent with Amber FFs
 ; Type of constraint algorithm
 constraint_algorithm     = lincs
 ; Do not constrain the start configuration
-continuation             = yes
+continuation             = no
 
 ; COM PULLING
 pull                     = no
