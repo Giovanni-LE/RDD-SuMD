@@ -499,158 +499,160 @@ corrette = 1
 fallimento = 1 #tiene conto delle volte in cui è stato necessario ricominciare la simulazione
 distanza_suMD_FS = 9 #Angstrom - rappresenta la distanza alla quale vogliamo che si entri nel final step
 
-while flag == 1:
-  if prima_volta == 1: #Se è la prima volta che si esegue lo script, allora è necessario generare un ambiente 
-    print("Creation of the box containing protein and ligand\n")
-    BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
-    minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
-    shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
-    prima_volta = 0
-    cambiare_velocità = 0 # la velocità degli atomi della prima simulazione non deve essere cambiata 
-  
-  avviso_preliminary_run = True
-  while m_primo >= 0: #PRELIMINARY RUN
-    if avviso_preliminary_run:
-      print("\nsuMD: The algorithm has ENTERED the 'PRELIMINARY RUN' step\n")
-      avviso_preliminary_run = False
 
-    if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
-      print(f"MD simulation #{corrette} ...", end='')
-      m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
-    else: #Eseguire MD cambiando le velocità
-      print(f"MD simulation #{corrette} - change of velocity ...", end='')
-      m_primo,dcm_vector = mdrun(n,MF=mdp_velocity,append=True)
-
-    if m_primo > 0: #Non produttivo
-      cambiare_velocità = 1
-      print(f" The step was not productive (Attempt {t_step})")
-      t_step += 1
-      shutil.rmtree(und_sim), os.mkdir(und_sim) #Cancello la cartella dei risultati
-    else: #m_primo < 0, il preliminary run è terminato!
-      cambiare_velocità = 0
-      print(f" The step was productive (Distance of the last step: {dcm_vector[-1]:.2f} Anstrong)")
-  
-      shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
-      shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
-      shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
-      corrette += 1
-      print('\nsuMD: The algorithm has EXITED the "preliminary run" step')
-
-    if t_step > t_max: #Riassegnare velocità e geometria (partire dall'inizio)
-      print(f"\nThe configuration under consideration has failed for {t_step} times. The system will be updated with new geometry and new speeds")
-      t_step = 0
-      corrette = 1 #bisogna ricominciare dall'inizio
-      cambiare_velocità = 0
+def run(self):
+  while flag == 1:
+    if prima_volta == 1: #Se è la prima volta che si esegue lo script, allora è necessario generare un ambiente 
+      print("Creation of the box containing protein and ligand\n")
       BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
       minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
       shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
-      shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
-      shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
-      fallimento +=1
-
-  avviso_suMD = True
-  flag2 = 1
-  while flag2 == 1: #suMD
+      prima_volta = 0
+      cambiare_velocità = 0 # la velocità degli atomi della prima simulazione non deve essere cambiata 
     
-    if avviso_suMD:
-      print("\nsuMD: The algorithm has ENTERED the 'suMD' step\n")
-      avviso_suMD = False
-  
-    if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
+    avviso_preliminary_run = True
+    while m_primo >= 0: #PRELIMINARY RUN
+      if avviso_preliminary_run:
+        print("\nsuMD: The algorithm has ENTERED the 'PRELIMINARY RUN' step\n")
+        avviso_preliminary_run = False
+
+      if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
+        print(f"MD simulation #{corrette} ...", end='')
+        m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
+      else: #Eseguire MD cambiando le velocità
+        print(f"MD simulation #{corrette} - change of velocity ...", end='')
+        m_primo,dcm_vector = mdrun(n,MF=mdp_velocity,append=True)
+
+      if m_primo > 0: #Non produttivo
+        cambiare_velocità = 1
+        print(f" The step was not productive (Attempt {t_step})")
+        t_step += 1
+        shutil.rmtree(und_sim), os.mkdir(und_sim) #Cancello la cartella dei risultati
+      else: #m_primo < 0, il preliminary run è terminato!
+        cambiare_velocità = 0
+        print(f" The step was productive (Distance of the last step: {dcm_vector[-1]:.2f} Anstrong)")
+    
+        shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
+        shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
+        shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
+        corrette += 1
+        print('\nsuMD: The algorithm has EXITED the "preliminary run" step')
+
+      if t_step > t_max: #Riassegnare velocità e geometria (partire dall'inizio)
+        print(f"\nThe configuration under consideration has failed for {t_step} times. The system will be updated with new geometry and new speeds")
+        t_step = 0
+        corrette = 1 #bisogna ricominciare dall'inizio
+        cambiare_velocità = 0
+        BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
+        minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
+        shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
+        shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
+        shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
+        fallimento +=1
+
+    avviso_suMD = True
+    flag2 = 1
+    while flag2 == 1: #suMD
+      
+      if avviso_suMD:
+        print("\nsuMD: The algorithm has ENTERED the 'suMD' step\n")
+        avviso_suMD = False
+    
+      if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
+        print(f"MD simulation #{corrette} ...", end='')
+        m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
+      else: #Eseguire MD cambiando le velocità
+        print(f"MD simulation #{corrette} - change of velocity ...", end='')
+        m_primo,dcm_vector = mdrun(n,MF=mdp_velocity,append=True)
+
+      if m_primo >= 0: #Non produttivo
+        cambiare_velocità = 1 #Cambiare le velocità dopo essere rientrato nel while   
+        print(f" The step was not productive (Consecutive attempt {counter1})")
+        counter1 += 1
+        shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
+      else:
+        print(f" The step was productive (Distance of the last step: {dcm_vector[-1]:.2f} Anstrong)")
+        
+        shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
+        shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
+        shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
+        corrette += 1
+
+        if dcm_vector[-1] > distanza_suMD_FS: #distanza ligando-proteina maggiore di distanza_suMD_FS
+          k_step = c_step + 1
+          counter1 = 0
+          c_step += 1
+          cambiare_velocità = 0 # avviare l'md run senza cambiare le velocità
+        else:
+          flag2 = 0
+          print(f'\nProtein and ligand are less than {distanza_suMD_FS} Angstrom apart ({dcm_vector[-1]:.2f} Angstrom)')
+          print('\nsuMD: The algorithm has EXITED the "suMD" step')
+
+      if counter1 >= counter1t: #Riassegnare velocità e geometria (partire dall'inizio)
+        print(f"\nThe configuration under consideration has failed for {counter1} times. The system will be updated with new geometry and new speeds")
+        corrette = 1 #bisogna ricominciare dall'inizio
+        t_step = 1 # counter that is increased by 1 and compared with t_max every time there is a failed step in the preliminary run
+        counter1 = 0 # counter that is incremented by 1 and compared with counter1t every time there is a failed step in the SuMD run
+        c_step = 0 # counters that allow us to determine when a SuMD run step is productive
+        k_step = 0
+        cambiare_velocità = 1 #bisogna cambiare geometria e velocità
+
+        BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
+        minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
+        shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
+        shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
+        shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
+        fallimento +=1
+      
+    avviso_final_step = True
+    flag3 = 0
+    while flag3 == 0: #FINAL STEP
+      if avviso_final_step:
+          print("\nsuMD: The algorithm has ENTERED the final step\n")
+          avviso_final_step = False
+
+      #MD finale quando la distanza ligando-proteina è minore di distanza_suMD_FS
       print(f"MD simulation #{corrette} ...", end='')
       m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
-    else: #Eseguire MD cambiando le velocità
-      print(f"MD simulation #{corrette} - change of velocity ...", end='')
-      m_primo,dcm_vector = mdrun(n,MF=mdp_velocity,append=True)
+      d_cm_out = dcm_vector[-1]
 
-    if m_primo >= 0: #Non produttivo
-      cambiare_velocità = 1 #Cambiare le velocità dopo essere rientrato nel while   
-      print(f" The step was not productive (Consecutive attempt {counter1})")
-      counter1 += 1
-      shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
-    else:
-      print(f" The step was productive (Distance of the last step: {dcm_vector[-1]:.2f} Anstrong)")
-      
-      shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
-      shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
-      shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
-      corrette += 1
-
-      if dcm_vector[-1] > distanza_suMD_FS: #distanza ligando-proteina maggiore di distanza_suMD_FS
-        k_step = c_step + 1
-        counter1 = 0
-        c_step += 1
-        cambiare_velocità = 0 # avviare l'md run senza cambiare le velocità
+      if d_cm_out > distanza_suMD_FS:
+        print(f"\nThe ligand has broken away from the protein (distance > {distanza_suMD_FS} Angstrom)")
+        flag3 = 1 # in questo modo si esce dal final step per poi rientrare nel suMD step
+        cambiare_velocità = 1 #nella prossima simulazione in suMD si deve fare in modo da cambiare le velocità degli atomi
+        m_primo = -1 # Imposto arbitrariamente m_primo < 0 in modo che non entrerà nel preliminary run
+        counter1 = 0 #inizializzo il contatore dei fallimenti del suMD step
+        shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
       else:
-        flag2 = 0
-        print(f'\nProtein and ligand are less than {distanza_suMD_FS} Angstrom apart ({dcm_vector[-1]:.2f} Angstrom)')
-        print('\nsuMD: The algorithm has EXITED the "suMD" step')
-
-    if counter1 >= counter1t: #Riassegnare velocità e geometria (partire dall'inizio)
-      print(f"\nThe configuration under consideration has failed for {counter1} times. The system will be updated with new geometry and new speeds")
-      corrette = 1 #bisogna ricominciare dall'inizio
-      t_step = 1 # counter that is increased by 1 and compared with t_max every time there is a failed step in the preliminary run
-      counter1 = 0 # counter that is incremented by 1 and compared with counter1t every time there is a failed step in the SuMD run
-      c_step = 0 # counters that allow us to determine when a SuMD run step is productive
-      k_step = 0
-      cambiare_velocità = 1 #bisogna cambiare geometria e velocità
-
-      BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
-      minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
-      shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
-      shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
-      shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
-      fallimento +=1
-     
-  avviso_final_step = True
-  flag3 = 0
-  while flag3 == 0: #FINAL STEP
-    if avviso_final_step:
-        print("\nsuMD: The algorithm has ENTERED the final step\n")
-        avviso_final_step = False
-
-    #MD finale quando la distanza ligando-proteina è minore di distanza_suMD_FS
-    print(f"MD simulation #{corrette} ...", end='')
-    m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
-    d_cm_out = dcm_vector[-1]
-
-    if d_cm_out > distanza_suMD_FS:
-      print(f"\nThe ligand has broken away from the protein (distance > {distanza_suMD_FS} Angstrom)")
-      flag3 = 1 # in questo modo si esce dal final step per poi rientrare nel suMD step
-      cambiare_velocità = 1 #nella prossima simulazione in suMD si deve fare in modo da cambiare le velocità degli atomi
-      m_primo = -1 # Imposto arbitrariamente m_primo < 0 in modo che non entrerà nel preliminary run
-      counter1 = 0 #inizializzo il contatore dei fallimenti del suMD step
-      shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
-    else:
-      shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
-      shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
-      shutil.rmtree(und_sim), os.mkdir(und_sim)
-      corrette += 1
+        shutil.copytree(und_sim,os.path.join(corr_sim,f"sim{corrette}")) #In modo da raccogliere tutte le simulazioni corrette
+        shutil.rmtree(act_sim), shutil.copytree(und_sim,act_sim) #In modo che alla prossima simulazione md si riparta dall'ultimo file .gro (le ultime velocità)
+        shutil.rmtree(und_sim), os.mkdir(und_sim)
+        corrette += 1
+          
+        if d_cm_out>=0 and d_cm_out<=2:   
+          counter02 += 1
+          
+          if counter02 > ct02:
+            print(" Binding site reached")
+            flag3 = 1 
+            flag = 0
         
-      if d_cm_out>=0 and d_cm_out<=2:   
-        counter02 += 1
-        
-        if counter02 > ct02:
-          print(" Binding site reached")
-          flag3 = 1 
-          flag = 0
-      
-      if d_cm_out>=2 and d_cm_out<=5: 
-        counter25 += 1  
-        if counter25> ct25:     
-          print(" Neighbor binding site reached")
-          flag3 = 1
-          flag = 0
+        if d_cm_out>=2 and d_cm_out<=5: 
+          counter25 += 1  
+          if counter25> ct25:     
+            print(" Neighbor binding site reached")
+            flag3 = 1
+            flag = 0
 
-      if d_cm_out>=5 and d_cm_out<=distanza_suMD_FS: 
-        counter59 += 1   
-        if counter59> ct59:  
-          print(" Meta binding site reached")  
-          flag3 = 1
-          flag = 0
-      allert=f'''\nBindig site step {counter02}/{ct02}
-Neighbour site step {counter25}/{ct25}
-Meta binding site {counter59}/{ct59}'''
-      print(allert)
+        if d_cm_out>=5 and d_cm_out<=distanza_suMD_FS: 
+          counter59 += 1   
+          if counter59> ct59:  
+            print(" Meta binding site reached")  
+            flag3 = 1
+            flag = 0
+        allert=f'''\nBindig site step {counter02}/{ct02}
+  Neighbour site step {counter25}/{ct25}
+  Meta binding site {counter59}/{ct59}'''
+        print(allert)
 
 
