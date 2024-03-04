@@ -1,5 +1,5 @@
+import sys
 class GmxMdp:
-    import sys
     def __init__(self) -> None:
         self.mdp_params=dict()
 

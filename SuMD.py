@@ -17,22 +17,53 @@ from MDAnalysis import transformations
 import pyfiglet
 import GmxMdp
 import time
-start_time=time.localtime()
 
-# Creare la scritta stilizzata
-text_sumd = pyfiglet.figlet_format("suMD", font="slant", width=80, justify="center")
-# Definire la larghezza della cornice
-border_width = 80
+def parse_options():
+  parser = argparse.ArgumentParser(description='''SuMD''')
+  parser.add_argument('--pdb',
+                        metavar='complex.pdb',
+                        dest='str',
+                        type=str,
+                        help='Input protein-ligand pdb file.',
+                        required=True)
+  for cmd in unknown:
+    if cmd not in expected:
+      print('\n\n{0}\nUnknown command found in your command line: "{1}".\n{0}\n\n'.format('*'*50,cmd))
+      sys.exit(1)
+  return args    
 
-# Creare la cornice intorno alla scritta
-border = '+' + '-' * border_width + '+\n'
+class GmxMdp:
+    def __init__(self) -> None:
+        self.mdp_params=dict()
+        self.mdpfile_out=False
+        self.mdpfile_in=False
+    def read_mdp(self,mdpfile_in=False):
+    #This function read an mdp file
+        if mdpfile_in:
+            "Give a correct mdpfilename"
+            sys.exit(-1)
+        with open(mdpfile_in,'r') as f:
+            #cicle in the mdp file with trivial check for the correctness of the file
+            #check if a line starts with a space
+            for lines in f:
+                line_nospace=lines.replace.replace(" ","")
+                if line_nospace[0]!=';' and line_nospace[0].isalpha():
+                    #TODO Pensare una gestione più intelligente dei parametri
+                    mdpparam=lines.strip().split("=")
+                    mdpparam[0]=mdpparam[0].replace.replace(" ","")
+                    self.mdp_params[mdpparam[0]]=mdpparam[1]
+    def write_mdp(self,mdpfile_out=False):
+        if mdpfile_out:
+            "Give a correct mdpfilename"
+            sys.exit(-1)
+        self.mdpfile_out=mdpfile_out
+        with open(mdpfile_out,'w') as f:
+            for key in self.mdp_params.keys():
+                f.write(f"{key} = {self.mdp_params[key]}\n")
+    def list_mdp_params(self):
+        for key in self.mdp_params:
+            print(f"{key} = {self.mdp_params[key]}\n")
 
-# Centrare la scritta all'interno della larghezza della cornice
-centered_text = text_sumd.center(border_width)
-
-# Stampare la scritta con la cornice centrata
-print(border + centered_text + '\n' + border)
-print(time.asctime(start_time))
 
 class SuMD:
   def __init__(self,PDBPROT=None,POCKET=None,PDBLIG=None,TopFOLD=None,distance_from_edge=0.5,distance_from_pocket=0.4):
@@ -41,10 +72,20 @@ class SuMD:
       'counter1t':17, # maximum threshold of failed attempts granted in the SuMD run
       'ct02':19, # threshold relating to the times in which the distance between the com is between 0 and 2 Å during the final phase of unsupervised MD
       'ct25':19, # threshold relating to the times in which the distance between the com is between 2 and 5 Å during the final phase of unsupervised MD
-      'ct59':19,
+      'ct59':19, # threshold relating to the times in which the distance between the com is between 5 and 9 Å during the final phase of unsupervised MD
       'distanza_suMD_FS':9, #Angstrom - rappresenta la distanza alla quale vogliamo che si entri nel final step
-      'n':5} # threshold relating to the times in which the distance between the com is between 5 and 9 Å during the final phase of unsupervised MD
-    
+      'n_sample':5} 
+    self.md_param={"coulombtype":"pme",
+                   "coulomb-modifier":"Potential-shift-Verlet",
+                   "rcoulomb-switch":"0.9",
+                   "rcoulomb":"1",
+                   "epsilon-r":"1",
+                   "epsilon-rf":"1",
+                   "vdwtype":"cutoff",
+                   "vdw-modifier":"Potential-shift-Verlet",
+                   "rvdw-switch":"0.9","rvdw":"1",
+                   "constraints":"h-bonds",
+                   "constraint_algorithm":"lincs"}
     if PDBPROT is None or POCKET is None or PDBLIG is None or TopFOLD is None:
       print("path to the protein pdb file:", PDBPROT)
       print("protein residues are:", POCKET)
@@ -63,7 +104,7 @@ class SuMD:
     self.distance_from_edge=str(distance_from_edge)
     self.distance_from_pocket=distance_from_pocket*10
   
-  def Linear_Fitting(PDB,XTC,n,POCKET=False,LIG="resname LIG"): #Funzione per il fitting lineare
+  def Linear_Fitting(self,PDB,XTC,n,POCKET=False,LIG="resname LIG"): #Funzione per il fitting lineare
     '''This function calculte the angular coefficent of the distance between POCKET and LIGAND over time
       PDB : str
       the path of the pdb file
@@ -111,7 +152,7 @@ class SuMD:
     m1 = np.polyfit(x,d.astype(np.float32),1) #linear fitting of distance vector
     return(m1[0],d)
 
-  def g_mdrun(OutputFile, xtcFile, log_File, edr_File,groFile, TprFile=None,gpu=False,append=False):
+  def g_mdrun(self,OutputFile, xtcFile, log_File, edr_File,groFile, TprFile=None,gpu=False,append=False):
 
     if not os.path.exists('log'):
         os.mkdir('log')         
@@ -133,6 +174,7 @@ class SuMD:
 
       cmd=[el for el in cmd if el != '']
       process = subprocess.run(cmd,stdout=glog,stderr=glog)   
+
 #TODO tirare fuori la selezione del ligando dalla funzione
 
   def SuMdStep(self,MF,append):
@@ -153,7 +195,7 @@ class SuMD:
       return m_primo,dcm_vector
 
 
-  def BuildGeometry(PDBPROT=None,PDBLIG=None,TopFOLD=None,newbox=True,d='5',mindist=100,solvate=False,Saltconc="0.15"):
+  def BuildGeometry(self,PDBPROT=None,PDBLIG=None,TopFOLD=None,newbox=True,d='5',mindist=100,solvate=False,Saltconc="0.15"):
       '''
       BuildGeometry
       Build the system geometry from a protein input file and a ligand input file, place randomly the ligand at a given
@@ -291,7 +333,7 @@ class SuMD:
           insert_try+=1 #increase try variable
           if insert_try>1000:#check if i Tried to inser the molecule more than 1000 times to avoid infinte loop
               sys.exit(f"Try to inser the molecule more than {insert_try} times, something wrong in the parameters") #exit in case of many insertion with an error
-    '''
+      '''
       print(f"moleculer will be inserted in {cord/10}, after {insert_try} attemps")#inform the user about the position of the placed molecule
       posfile=os.path.join(outdir,"pos.dat")# define the path the position file
       
@@ -363,8 +405,6 @@ class SuMD:
           sys.exit("Error during the equilibration step - mdrun doesn't work")
       return 0
 
-
-
   def CreateWorkingFold(self):
     self.workfold="sumd"#define workfold folder --> folder che conterrà ogni operazione dell'algoritmo
     if not os.path.exists(self.workfold): #chekc if the workfold exists
@@ -397,43 +437,132 @@ class SuMD:
     self.equil= os.path.join(self.outdir,"equilibration") #define equilibration folder --> folder che conterrà l'output dell'equalizzazione NVT 
     if not os.path.exists(self.equil): #chekc folder exists
       os.mkdir(self.equil) #in case doesn't exist create the directory
-  def MdpFile(self):
-     pass
-     
-  '''mdp_em = 'mdp_nowater/02-em.mdp'
-  #mdp_nvt = 'mdp_nowater/03-nvt.mdp'
-  #mdp_velocity = 'mdp_nowater/06-md.mdp'
-  #mdp_classic = 'mdp_nowater/07-md.mdp'
-  mdp_nvt = 'mdp_nowater_acorciata/03-nvt.mdp'
-  mdp_velocity = 'mdp_nowater_acorciata/06-md.mdp'
-  mdp_classic = 'mdp_nowater_acorciata/07-md.mdp'
+    self.mdp_fold= os.path.join(self.outdir,"mdp") #define mdp folder --> folder che conterrà gli mdp
+    if not os.path.exists(self.mdp_fold): #chekc folder exists
+      os.mkdir(self.mdp_fold) #in case doesn't exist create the directory
+  
+  def EmMdpFile(self,emMdpinput=False):
+    '''Questa funzione crea il file di input della minimizzazione
+    '''
+    self.EmMdp=GmxMdp()
+    defaultEmparams={"integrator":"steep",
+                     "nsteps":"10000",
+                     "emtol":"1000",
+                     "emstep":"0.01"}
+    self.EmMdp.mdp_params.update(self.md_param)
+    self.EmMdp.mdp_params.update(defaultEmparams)
+    if emMdpinput:
+      self.emMdp.read_mdp(emMdpinput)
+    self.EmMdp.write_mdp(self.mdp_fold+"01-em.mdp")
 
-  mdp_em = 'mdp/02-em.mdp'
-  #mdp_nvt = 'mdp_nowater/03-nvt.mdp'
-  #mdp_velocity = 'mdp_nowater/06-md.mdp'
-  #mdp_classic = 'mdp_nowater/07-md.mdp'
-  mdp_nvt = 'mdp/03-nvt.mdp'
-  mdp_velocity = 'mdp/06-md.mdp'
-  mdp_classic = 'mdp/07-md.mdp'
-  #------------------------------------------------------------------------
+  def NvtMdpFile(self,nvtMdpInput=False):
+    '''Questa funzione crea il file di input della minimizzazione
+    '''
+    self.NvtMdp=GmxMdp()
+    defaultNvtparams={"define":"-DPOSRES",
+                      "integrator":"md",
+                      'tinit':'0','dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'yes',
+                      'gen_temp':'300',
+                      'gen_seed':'-1'}
+    self.NvtMdp.mdp_params.update(self.md_param)
+    self.NvtMdp.mdp_params.update(defaultNvtparams)
+    if nvtMdpInput:
+      self.NvtMdp.read_mdp(nvtMdpInput)
+    self.NvtMdp.write_mdp(self.mdp_fold+"02-nvt.mdp")
+  
+  
+  def NptMdpFile(self,nptMdpinput=False):
+    '''Questa funzione crea il file di input della Npt di equilibrazione
+    '''
+    self.NptMdp=GmxMdp()
+    defaultNptparams={"define":"-DPOSRES",
+                      "integrator":"md",
+                      'tinit':'0',
+                      'dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'no',
+                      'pcoupl':'Parrinello-Rahman',
+                      'pcoupltype':'isotropic',
+                      'nstpcouple':'-1',
+                      'tau_p':'5.0',
+                      'compressibility':'4.5e-5',
+                      'ref_p':'1.0'}
+    self.NptMdp.mdp_params.update(self.md_param)
+    self.NptMdp.mdp_params.update(defaultNptparams)
+    if nptMdpInput:
+      self.NptMdp.read_mdp(nptMdpInput)
+    self.NptMdp.write_mdp(self.mdp_fold+"03-npt.mdp")
 
-  '''
+  def MdMdpFile(self,MdMdpInput=False):
+    '''Questa funzione crea il file di input della minimizzazione
+    '''
+    self.MdMdp=GmxMdp()
+    defaultMdparams={"integrator":"md",
+                      'tinit':'0',
+                      'dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'no',
+                      'pcoupl':'Parrinello-Rahman',
+                      'pcoupltype':'isotropic',
+                      'nstpcouple':'-1',
+                      'tau_p':'5.0',
+                      'compressibility':'4.5e-5',
+                      'ref_p':'1.0',
+                      'nstxout':'50000',
+                      'nstvout':'50000',
+                      'nstfout':'50000',
+                      'nstlog':'500',
+                      'nstenergy':'500'}
+    self.MdMdp.mdp_params.update(self.md_param)
+    self.MdMdp.mdp_params.update(defaultMdparams)
+    if MdMdpInput:
+      self.NptMdp.read_mdp(MdMdpInput)
+    self.MdMdp.write_mdp(self.mdp_fold+"04-md.mdp")
 
 
   def run(self):
     #SuMD params inizialization
+    print("The SuMD simulation will start with the following Parameters")
     for param_key in self.sumd_param.keys():
-       exec("{param_key}={self.sumd_param[param_key]}")
+        print(f"|{param_key}\t{self.sumd_param[param_key]}|")
     
-    
-    
+    '''    self.sumd_param={'m':0, # threshold of the angular coefficient values of the straight line that interpolates the saved points
+      't_max':31, # maximum threshold of bankruptcy attempts granted in the preliminary run
+      'counter1t':17, # maximum threshold of failed attempts granted in the SuMD run
+      'ct02':19, # threshold relating to the times in which the distance between the com is between 0 and 2 Å during the final phase of unsupervised MD
+      'ct25':19, # threshold relating to the times in which the distance between the com is between 2 and 5 Å during the final phase of unsupervised MD
+      'ct59':19,
+      'distanza_suMD_FS':9, #Angstrom - rappresenta la distanza alla quale vogliamo che si entri nel final step
+      'n':5} # threshold relating to the times in which the distance between the com is between 5 and 9 Å during the final phase of unsupervised MD
+    '''
     #Inizializzazione
+
     m_primo=0 # value of the angular coefficient of the line which is updated and compared with m each short MD simulation
     t_step=1 # counter that is increased by 1 and compared with t_max every time there is a failed step in the preliminary run
     counter1=0 # counter that is incremented by 1 and compared with counter1t every time there is a failed step in the SuMD run
     c_step=0 # counters that allow us to determine when a SuMD run step is productive
     k_step=0 # counters that allow us to determine when a SuMD run step is productive
-    d_cm_vector=np.zeros(n)# vector in which the distances of the com taken in the 5 steps are entered within each short MD simulation during the SuMD run
+    d_cm_vector=np.zeros(self.sumd_param['n'])# vector in which the distances of the com taken in the 5 steps are entered within each short MD simulation during the SuMD run
     d_cm_out=0 # final distance value dcm stored at the end of the short MD simulations that occur once supervision is stopped
     counter02=0 # counter that is updated and compared with ct02 every time that  dcm is between 0 and 2 Å
     counter25=0 # counter that is updated and compared with ct25 every time that dcm is between 2 and 5 Å
@@ -449,7 +578,7 @@ class SuMD:
     und_sim=self.und_sim
     corr_sim=self.corr_sim
     fal_sim=self.fal_sim
-
+    mdp_fold=self.mdp_fold
     
     
     
@@ -466,7 +595,8 @@ class SuMD:
       if prima_volta == 1: #Se è la prima volta che si esegue lo script, allora è necessario generare un ambiente 
         print("Creation of the box containing protein and ligand\n")
         BuildGeometry(self.PDBPROT,self.PDBLIG,self.TopFOLD,solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
-        minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
+        
+        minimization_equilibration(MF_m = self.EmMdp.mdpfile_out, MF_e = self.NvtMdp.mdpfile_out)
         shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
         prima_volta = 0
         cambiare_velocità = 0 # la velocità degli atomi della prima simulazione non deve essere cambiata 
@@ -479,11 +609,16 @@ class SuMD:
 
         if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
           print(f"MD simulation #{corrette} ...", end='')
-          m_primo,dcm_vector = SuMdStep(n,MF=mdp_classic,append=True)
+          self.MdMdp.mdp_params['gen-vel']='no'
+          self.MdMdp.mdp_params['continuation']='yes'
+          self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
+          m_primo,dcm_vector = SuMdStep(self.sumd_param['n'],MF=self.MdMdp.mdpfile_out,append=True)
         else: #Eseguire MD cambiando le velocità
+          self.MdMdp.mdp_params['gen-vel']='yes'
+          self.MdMdp.mdp_params['continuation']='no'
+          self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
           print(f"MD simulation #{corrette} - change of velocity ...", end='')
-          m_primo,dcm_vector = SuMdStep(n,MF=mdp_velocity,append=True)
-
+          m_primo,dcm_vector = SuMdStep(self.sumd_param['n'],MF=self.MdMdp.mdpfile_out,append=True)
         if m_primo > 0: #Non produttivo
           cambiare_velocità = 1
           print(f" The step was not productive (Attempt {t_step})")
@@ -499,7 +634,7 @@ class SuMD:
           corrette += 1
           print('\nsuMD: The algorithm has EXITED the "preliminary run" step')
 
-        if t_step > t_max: #Riassegnare velocità e geometria (partire dall'inizio)
+        if t_step > self.sumd_param['t_max']: #Riassegnare velocità e geometria (partire dall'inizio)
           print(f"\nThe configuration under consideration has failed for {t_step} times. The system will be updated with new geometry and new speeds")
           t_step = 0
           corrette = 1 #bisogna ricominciare dall'inizio
@@ -521,11 +656,17 @@ class SuMD:
       
         if cambiare_velocità == 0: #Eseguire MD senza cambiare le velocità
           print(f"MD simulation #{corrette} ...", end='')
-          m_primo,dcm_vector = SuMdStep(MF=mdp_classic,append=True)
+          self.MdMdp.mdp_params['gen-vel']='no'
+          self.MdMdp.mdp_params['continuation']='yes'
+          self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
+          m_primo,dcm_vector = SuMdStep(self.sumd_param['n_sample'],MF=self.MdMdp.mdpfile_out,append=True)
         else: #Eseguire MD cambiando le velocità
           print(f"MD simulation #{corrette} - change of velocity ...", end='')
-          m_primo,dcm_vector = SuMdStep(MF=mdp_velocity,append=True)
-
+          self.MdMdp.mdp_params['gen-vel']='yes'
+          self.MdMdp.mdp_params['continuation']='no'
+          self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
+          print(f"MD simulation #{corrette} - change of velocity ...", end='')
+          m_primo,dcm_vector = SuMdStep(n,MF=self.MdMdp.mdpfile_out,append=True)
         if m_primo >= 0: #Non produttivo
           cambiare_velocità = 1 #Cambiare le velocità dopo essere rientrato nel while   
           print(f" The step was not productive (Consecutive attempt {counter1})")
@@ -539,17 +680,17 @@ class SuMD:
           shutil.rmtree(und_sim), os.mkdir(und_sim) #elimino cartella dei risultati
           corrette += 1
 
-          if dcm_vector[-1] > distanza_suMD_FS: #distanza ligando-proteina maggiore di distanza_suMD_FS
+          if dcm_vector[-1] > self.sumd_param['distanza_suMD_FS']: #distanza ligando-proteina maggiore di distanza_suMD_FS
             k_step = c_step + 1
             counter1 = 0
             c_step += 1
             cambiare_velocità = 0 # avviare l'md run senza cambiare le velocità
           else:
             flag2 = 0
-            print(f'\nProtein and ligand are less than {distanza_suMD_FS} Angstrom apart ({dcm_vector[-1]:.2f} Angstrom)')
+            print(f"\nProtein and ligand are less than {self.sumd_param['distanza_suMD_FS']} Angstrom apart ({dcm_vector[-1]:.2f} Angstrom)")
             print('\nsuMD: The algorithm has EXITED the "suMD" step')
 
-        if counter1 >= counter1t: #Riassegnare velocità e geometria (partire dall'inizio)
+        if counter1 >= self.sumd_param['counter1t']: #Riassegnare velocità e geometria (partire dall'inizio)
           print(f"\nThe configuration under consideration has failed for {counter1} times. The system will be updated with new geometry and new speeds")
           corrette = 1 #bisogna ricominciare dall'inizio
           t_step = 1 # counter that is increased by 1 and compared with t_max every time there is a failed step in the preliminary run
@@ -558,8 +699,8 @@ class SuMD:
           k_step = 0
           cambiare_velocità = 1 #bisogna cambiare geometria e velocità
 
-          BuildGeometry(PDBPROT,PDBLIG,TopFOLD,solvate=True,d='0.5',dist=40,pocket=POCKET)
-          minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
+          BuildGeometry(self.PDBPROT,self.PDBLIG,self.TopFOLD,solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
+          minimization_equilibration( MF_m = self.EmMdp.mdpfile_out, MF_e = self.NvtMdp.mdpfile_out)
           shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
           shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
           shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
@@ -574,11 +715,14 @@ class SuMD:
 
         #MD finale quando la distanza ligando-proteina è minore di distanza_suMD_FS
         print(f"MD simulation #{corrette} ...", end='')
-        m_primo,dcm_vector = mdrun(n,MF=mdp_classic,append=True)
+        self.MdMdp.mdp_params['gen-vel']='no'
+        self.MdMdp.mdp_params['continuation']='yes'
+        self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
+        m_primo,dcm_vector = mdrun(self.sumd_param['n'],MF=mdp_classic,append=True)
         d_cm_out = dcm_vector[-1]
 
-        if d_cm_out > distanza_suMD_FS:
-          print(f"\nThe ligand has broken away from the protein (distance > {distanza_suMD_FS} Angstrom)")
+        if d_cm_out > self.sumd_param['distanza_suMD_FS']:
+          print(f"\nThe ligand has broken away from the protein (distance > {self.sumd_param['distanza_suMD_FS']} Angstrom)")
           flag3 = 1 # in questo modo si esce dal final step per poi rientrare nel suMD step
           cambiare_velocità = 1 #nella prossima simulazione in suMD si deve fare in modo da cambiare le velocità degli atomi
           m_primo = -1 # Imposto arbitrariamente m_primo < 0 in modo che non entrerà nel preliminary run
@@ -592,28 +736,44 @@ class SuMD:
             
           if d_cm_out>=0 and d_cm_out<=2:   
             counter02 += 1
-            
-            if counter02 > ct02:
+            if counter02 > self.sumd_param['ct02']:
               print(" Binding site reached")
               flag3 = 1 
               flag = 0
           
           if d_cm_out>=2 and d_cm_out<=5: 
             counter25 += 1  
-            if counter25> ct25:     
+            if counter25> self.sumd_param['ct25']:     
               print(" Neighbor binding site reached")
               flag3 = 1
               flag = 0
 
-          if d_cm_out>=5 and d_cm_out<=distanza_suMD_FS: 
+          if d_cm_out>=5 and d_cm_out<=self.sumd_param['distanza_suMD_FS']: 
             counter59 += 1   
-            if counter59> ct59:  
+            if counter59> self.sumd_param['ct59']:  
               print(" Meta binding site reached")  
               flag3 = 1
               flag = 0
-          allert=f'''\nBindig site step {counter02}/{ct02}
-    Neighbour site step {counter25}/{ct25}
-    Meta binding site {counter59}/{ct59}'''
+          allert=f'''\nBindig site step {counter02}/{self.sumd_param['ct02']}
+    Neighbour site step {counter25}/{self.sumd_param['ct25']}
+    Meta binding site {counter59}/{self.sumd_param['ct59']}'''
           print(allert)
 
 
+if __name__=="__main__":
+  start_time=time.localtime()
+
+  # Creare la scritta stilizzata
+  text_sumd = pyfiglet.figlet_format("suMD", font="slant", width=80, justify="center")
+  # Definire la larghezza della cornice
+  border_width = 80
+
+  # Creare la cornice intorno alla scritta
+  border = '+' + '-' * border_width + '+\n'
+
+  # Centrare la scritta all'interno della larghezza della cornice
+  centered_text = text_sumd.center(border_width)
+
+  # Stampare la scritta con la cornice centrata
+  print(border + centered_text + '\n' + border)
+  print(time.asctime(start_time))
