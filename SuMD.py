@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# coding: utf-8
 import sys
 import argparse
 import warnings
@@ -20,12 +22,41 @@ import time
 
 def parse_options():
   parser = argparse.ArgumentParser(description='''SuMD''')
-  parser.add_argument('--pdb',
+  parser.add_argument('--pdbComplex',
                         metavar='complex.pdb',
-                        dest='str',
+                        dest='pdbComplex',
                         type=str,
                         help='Input protein-ligand pdb file.',
                         required=True)
+  parser.add_argument('--pdbLig',
+                        metavar='lig.pdb',
+                        dest='pdbLig',
+                        type=str,
+                        help='Input Ligand pdb file.',
+                        required=True)
+  parser.add_argument('--top',
+                        metavar='TopFolder',
+                        dest='TopFold',
+                        type=str,
+                        help='Input protein-ligand pdb file.',
+                        required=True)
+  parser.add_argument('--Pocket',
+                        metavar='String',
+                        dest='Pocket',
+                        type=str,
+                        help='String defining the pocket',
+                        required=True)
+
+  parser.add_argument('--OutFold',
+                        dest="Outfold",
+                        default='.',
+                        help='Folder for the output',
+                        required=False)
+
+
+
+
+  args, unknown = parser.parse_known_args()
   for cmd in unknown:
     if cmd not in expected:
       print('\n\n{0}\nUnknown command found in your command line: "{1}".\n{0}\n\n'.format('*'*50,cmd))
@@ -209,6 +240,7 @@ class SuMD:
           from Gromacs_Tools import g_make_ndx
           from Gromacs_Tools import g_genion
           from Gromacs_Tools import g_grompp
+          from Gromacs_Tools import g_mdrun
       except:
           sys.exit("Error in module loading")
       #Check dei file
@@ -399,7 +431,7 @@ class SuMD:
           sys.exit("\nError during the equilibration step - grompp doesn't work")
 
       g_mdrun(OutputFile= os.path.join(equil,"md.trr"),xtcFile='', log_File= os.path.join(equil,"md.log"), edr_File= os.path.join(equil,"md.edr"), groFile=os.path.join(equil,"md.gro"), TprFile=os.path.join(equil,"md.tpr"),gpu=gpu)
-      if os.path.exists(os.path.join(equil,"md.trr")):
+      if os.path.exists(os.path.join(equil,"md.log")):
           print(' Equilibration completed')
       else:
           sys.exit("Error during the equilibration step - mdrun doesn't work")
@@ -442,7 +474,8 @@ class SuMD:
       os.mkdir(self.mdp_fold) #in case doesn't exist create the directory
   
   def EmMdpFile(self,emMdpinput=False):
-    '''Questa funzione crea il file di input della minimizzazione
+    '''
+    deQuesta funzione crea il file di input della minimizzazione
     '''
     self.EmMdp=GmxMdp()
     defaultEmparams={"integrator":"steep",
@@ -508,7 +541,7 @@ class SuMD:
     self.NptMdp.write_mdp(self.mdp_fold+"03-npt.mdp")
 
   def MdMdpFile(self,MdMdpInput=False):
-    '''Questa funzione crea il file di input della minimizzazione
+    '''Questa funzione crea il file di input della Production
     '''
     self.MdMdp=GmxMdp()
     defaultMdparams={"integrator":"md",
@@ -538,7 +571,6 @@ class SuMD:
     if MdMdpInput:
       self.NptMdp.read_mdp(MdMdpInput)
     self.MdMdp.write_mdp(self.mdp_fold+"04-md.mdp")
-
 
   def run(self):
     #SuMD params inizialization
@@ -579,16 +611,6 @@ class SuMD:
     corr_sim=self.corr_sim
     fal_sim=self.fal_sim
     mdp_fold=self.mdp_fold
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     while flag == 1:
@@ -777,3 +799,6 @@ if __name__=="__main__":
   # Stampare la scritta con la cornice centrata
   print(border + centered_text + '\n' + border)
   print(time.asctime(start_time))
+  args=parse_options()
+ 
+  SuMD(args.pdb,args.pocket,args.PdbLig,args.TopFold)
