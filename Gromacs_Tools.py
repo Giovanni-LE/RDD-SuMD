@@ -14,7 +14,7 @@ warnings.filterwarnings('ignore')
 
 
 #controllo che sia presente gromacs sulla macchina
-
+print(shutil.which('gmx'))
 if shutil.which('gmx') is None:
     print('\n{0}\nThe program gmx is not present in the current environment\n{0}\n'.format('#'*80))
     sys.exit(10)

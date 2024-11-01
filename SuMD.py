@@ -84,8 +84,9 @@ class GmxMdp:
                     mdpparam[0]=mdpparam[0].replace.replace(" ","")
                     self.mdp_params[mdpparam[0]]=mdpparam[1]
     def write_mdp(self,mdpfile_out=False):
-        if mdpfile_out:
-            "Give a correct mdpfilename"
+        
+        if not mdpfile_out:
+            print("Give a correct mdpfilename")
             sys.exit(-1)
         self.mdpfile_out=mdpfile_out
         with open(mdpfile_out,'w') as f:
@@ -97,6 +98,7 @@ class GmxMdp:
 
 
 class SuMD:
+  # Costruttore della classe Su(pervised) Molecular Dynamics
   def __init__(self,PDBPROT=None,POCKET=None,PDBLIG=None,TopFOLD=None,distance_from_edge=0.5,distance_from_pocket=0.4):
     self.sumd_param={'m':0, # threshold of the angular coefficient values of the straight line that interpolates the saved points
       't_max':31, # maximum threshold of bankruptcy attempts granted in the preliminary run
@@ -134,8 +136,12 @@ class SuMD:
     self.TopFold=TopFOLD
     self.distance_from_edge=str(distance_from_edge)
     self.distance_from_pocket=distance_from_pocket*10
-  
-  def Linear_Fitting(self,PDB,XTC,n,POCKET=False,LIG="resname LIG"): #Funzione per il fitting lineare
+
+
+    #da integrare in futuro con un controllo 
+    self.gpu=True
+
+  def Linear_Fitting(self,PDB,XTC): #Funzione per il fitting lineare
     '''This function calculte the angular coefficent of the distance between POCKET and LIGAND over time
       PDB : str
       the path of the pdb file
@@ -163,9 +169,9 @@ class SuMD:
     LIG = u.select_atoms(LIG)
       
     n_frame = u.trajectory.n_frames
-    #print(f"Numero di frame di u.trajectory: {n_frame}")
+    print(f"Numero di frame di u.trajectory: {n_frame}")
 
-    step = n_frame/(int(n)-1) #calculate how many steps of the trajectory will be analyzed (used as integer)
+    step = n_frame/(int(self.sumd_param['n_samples'])-1) #calculate how many steps of the trajectory will be analyzed (used as integer)
     #print(step) #debug
     d = np.empty(len(u.trajectory[:n_frame:int(step)]), dtype=float) #distance vector
 
@@ -175,14 +181,16 @@ class SuMD:
       d[p] = float(distances.distance_array(np.array(pocket.center_of_mass()),np.array(LIG.center_of_geometry())))
       p += 1
 
-    x = np.linspace(0,n_frame-1,int(n), dtype=float) #x-axis time reference
+    x = np.linspace(0,n_frame-1,int(self.sumd_param['n_samples']), dtype=float) #x-axis time reference
 
       #print(f"Lunghezza di x: {len(x)} - x: {x}")
       #print(f"Lunghezza di y: {len(d.astype(np.float32))} - y: {d.astype(np.float32)}")
 
     m1 = np.polyfit(x,d.astype(np.float32),1) #linear fitting of distance vector
     return(m1[0],d)
+  
 
+  #TOCHECK serve veramente? 
   def g_mdrun(self,OutputFile, xtcFile, log_File, edr_File,groFile, TprFile=None,gpu=False,append=False):
 
     if not os.path.exists('log'):
@@ -207,26 +215,25 @@ class SuMD:
       process = subprocess.run(cmd,stdout=glog,stderr=glog)   
 
 #TODO tirare fuori la selezione del ligando dalla funzione
-
   def SuMdStep(self,MF,append):
-      und_sim=self.und_sim
+      #und_sim=self.und_sim
       Gromacs_Tools.g_grompp(MdpFile=MF, TopolFile= os.path.join(self.outdir,"topol","topol.top"), CoordFile= os.path.join(self.act_sim,"md.gro"), TprFile= os.path.join(self.und_sim,"md.tpr"), IndexFile= os.path.join(self.minim,"index.ndx"),maxwarning='2')   
       if not os.path.exists(os.path.join(self.und_sim,"md.tpr")):
           sys.exit('error during the creation of tpr file (grompp)')
           
-      g_mdrun(OutputFile= os.path.join(und_sim,"md.trr"),xtcFile= os.path.join(und_sim,"md.xtc"), log_File= os.path.join(und_sim,"md.log"),edr_File=os.path.join(und_sim,"md.edr"),groFile=os.path.join(und_sim,"md.gro"), TprFile=os.path.join(und_sim,"md.tpr"),gpu=self.gpu,append=append)
-      if not os.path.exists(os.path.join(und_sim,"md.xtc")):
+      g_mdrun(OutputFile= os.path.join(self.und_sim,"md.trr"),xtcFile= os.path.join(self.und_sim,"md.xtc"), log_File= os.path.join(self.und_sim,"md.log"),edr_File=os.path.join(self.und_sim,"md.edr"),groFile=os.path.join(self.und_sim,"md.gro"), TprFile=os.path.join(self.und_sim,"md.tpr"),gpu=self.gpu,append=append)
+      if not os.path.exists(os.path.join(self.und_sim,"md.xtc")):
           sys.exit('error during the creation of xtc file (mdrun)')
       
-      Gromacs_Tools.g_editconf(f=os.path.join(und_sim,"md.tpr"), o=os.path.join(und_sim,"md.pdb")) # per avere il file pdb
-      if not os.path.exists(os.path.join(und_sim,"md.pdb")):
+      Gromacs_Tools.g_editconf(f=os.path.join(self.und_sim,"md.tpr"), o=os.path.join(self.und_sim,"md.pdb")) # per avere il file pdb
+      if not os.path.exists(os.path.join(self.und_sim,"md.pdb")):
           sys.exit('error during the creation of pdb file (editconf)')
 
-      m_primo,dcm_vector = Linear_Fitting(PDB=os.path.join(und_sim,"md.tpr"),XTC = os.path.join(und_sim,"md.xtc"),n=n,POCKET='resid 267 or resid 252 or resid 264 or resid 256 or resid 174')
+      m_primo,dcm_vector = Linear_Fitting(PDB=os.path.join(self.und_sim,"md.tpr"),XTC = os.path.join(self.und_sim,"md.xtc"))
       return m_primo,dcm_vector
 
+  def BuildGeometry(self,newbox=True,d='5',mindist=100,solvate=True,Saltconc="0.15"):
 
-  def BuildGeometry(self,PDBPROT=None,PDBLIG=None,TopFOLD=None,newbox=True,d='5',mindist=100,solvate=False,Saltconc="0.15"):
       '''
       BuildGeometry
       Build the system geometry from a protein input file and a ligand input file, place randomly the ligand at a given
@@ -244,19 +251,19 @@ class SuMD:
       except:
           sys.exit("Error in module loading")
       #Check dei file
-      if os.stat(PDBPROT).st_size == 0: #check PDBPROT file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBLIG.split('/')[-1] )   
+      if os.stat(self.PDBPROT).st_size == 0: #check PDBPROT file
+          raise ValueError('The file %s if empty, file doesn\'t exixst'%self.PDBPROT.split('/')[-1] )   
     
-      if os.stat(PDBLIG).st_size == 0: #check PDBLIG file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBPROT.split('/')[-1])  
+      if os.stat(self.PDBLIG).st_size == 0: #check PDBLIG file
+          raise ValueError('The file %s if empty, file doesn\'t exixst'%self.PDBLIG.split('/')[-1])  
       
-      if os.stat(TopFOLD).st_size == 0: #check PDBLIG file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBPROT.split('/'))  
+      if os.stat(self.TopFold).st_size == 0: #check PDBLIG file
+          raise ValueError('The file %s if empty, file doesn\'t exixst'%self.TopFold.split('/'))  
       
           outfile=PDBPROT
       if newbox:
-          outfile=os.path.join(outdir,'tmp.box.pdb')#define the path of the file
-          g_editconf(f=PDBPROT,d=d,o=outfile)#create the new configuration file
+          outfile=os.path.join(self.outdir,'tmp.box.pdb')#define the path of the file
+          g_editconf(f=self.PDBPROT,d=d,o=outfile)#create the new configuration file
       prot=mda.Universe(outfile)#load the new configuration in order to place the ligand in a random position above mindist
       dist=0 #flag to go out
       insert_try=0 #flag to avoid infinite loop
@@ -268,30 +275,31 @@ class SuMD:
           if insert_try>1000:#check if i Tried to inser the molecule more than 1000 times to avoid infinte loop
               sys.exit(f"Try to inser the molecule more than {insert_try} times, something wrong in the parameters") #exit in case of many insertion with an error
       print(f"moleculer will be inserted in {cord/10}, after {insert_try} attemps")#inform the user about the position of the placed molecule
-      posfile=os.path.join(outdir,"pos.dat")# define the path the position file
+      posfile=os.path.join(self.outdir,"pos.dat")# define the path the position file
       
       with open(posfile,'w') as f:
           ele=[f"{numb/10:>.2f}" for numb in cord.tolist()]#traslate the cordinate to a string /10 to convert Amstrong to nm, 
           f.write(' '.join(ele))
           f.write('\n')
-      outsys=os.path.join(outdir,"sys.pdb")#define system path
-      g_insert_molecule(f=outfile,o=outsys,ci=PDBLIG,ip=posfile)#insert the molecule in the random position defined before  
-      TopFold=os.path.join(outdir,"topol")#define the position of the topology file
-
-      if os.path.exists(TopFold): #chekc if the file exist
-          shutil.rmtree(TopFold)
-
-      shutil.copytree(TopFOLD,TopFold) #copy the topology folder in order to don't alterate the input
+      outsys=os.path.join(self.outdir,"sys.pdb")#define system path
+      g_insert_molecule(f=outfile,o=outsys,ci=self.PDBLIG,ip=posfile)#insert the molecule in the random position defined before  
+      
+      
+      
+      self.top_fold=os.path.join(self.outdir,"topol")#define the position of the topology file
+      if os.path.exists(self.top_fold): #chekc if the file exist
+          shutil.rmtree(self.top_fold)
+      shutil.copytree(self.TopFold,self.top_fold) #copy the topology folder in order to don't alterate the input
       
       if solvate:
           print(f"I will solvate the system, and neutralyze it with {Saltconc} mol/L")
-          solvfile=os.path.join(outdir,"solv.pdb")# define the solvent file output
-          topfile=os.path.join(TopFold,"topol.top")#define the topology outputpaht
+          solvfile=os.path.join(self.outdir,"solv.pdb")# define the solvent file output
+          topfile=os.path.join(self.top_fold,"topol.top")#define the topology outputpaht
           g_solvate(cp=outsys,p=topfile,o=solvfile)#add water to the system and modify the topology file
           
           with open("tmp.mdp","w") as f: #create a dummy mdp file
               f.write("\n")
-          ionstprout=os.path.join(outdir,"ions.tpr")#define the output of the tpr file to add ions
+          ionstprout=os.path.join(self.outdir,"ions.tpr")#define the output of the tpr file to add ions
           g_grompp(MdpFile="tmp.mdp",TopolFile=topfile,CoordFile=solvfile,TprFile=ionstprout)#create the tpr file to add ions
           os.remove("tmp.mdp")#remove the mdp file
           os.remove(outsys)# remove the old system file
@@ -315,127 +323,144 @@ class SuMD:
       yi=xy*np.sin(tetha)+cent[1]
       return np.array([xi,yi,zi])
 
-  def BuildGeometry(PDBPROT=None,PDBLIG=None,TopFOLD=None,newbox=True,d='5',dist=100,solvate=False,Saltconc="0.15",pocket="all"):
-      '''
-      BuildGeometry
-      Build the system geometry from a protein input file and a ligand input file, place randomly the ligand at a given  
-      '''
-      
-      try:
-          from Gromacs_Tools import g_editconf
-          from Gromacs_Tools import g_insert_molecule
-          from Gromacs_Tools import g_solvate
-          from Gromacs_Tools import g_make_ndx
-          from Gromacs_Tools import g_genion
-          from Gromacs_Tools import g_grompp
-      except:
-          sys.exit("Error in module loading")
-      #Check dei file
-      if os.stat(PDBPROT).st_size == 0: #check PDBPROT file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBLIG.split('/')[-1] )   
-    
-      if os.stat(PDBLIG).st_size == 0: #check PDBLIG file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBPROT.split('/')[-1])  
-      
-      if os.stat(TopFOLD).st_size == 0: #check PDBLIG file
-          raise ValueError('The file %s if empty, file doesn\'t exixst'%PDBPROT.split('/'))  
-      outfile=PDBPROT
-      if newbox:
-          outfile=os.path.join(outdir,'tmp.box.pdb')#define the path of the file
-          g_editconf(f=PDBPROT,d=d,o=outfile)#create the new configuration file
-      #Load protein and Ligand
-      
-      prot=mda.Universe(outfile)#load the new configuration in order to place the ligand in a random position above mindist
-      LIG=mda.Universe(PDBLIG)
-      rg=LIG.atoms.radius_of_gyration()*1.1#10% security coefficent
-      insert_try=0 #flag to avoid infinite loop
-      mindist=0 #flag to go out from simulation
-      while rg>=mindist:
-          cent=prot.select_atoms(POCKET).center_of_mass()
-          cord=RandSphere(r=dist,cent=cent) 
-          mindist=distances.distance_array(cord,prot.atoms.positions).min()#chek if the COM of the new position is above mindist
-          insert_try+=1 #increase try variable
-          print(f"{cord}")
-          if insert_try>1000:#check if i Tried to inser the molecule more than 1000 times to avoid infinte loop
-              sys.exit(f"Try to inser the molecule more than {insert_try} times, something wrong in the parameters") #exit in case of many insertion with an error
-      '''
-      while dist<mindist:#check to insert the ligand
-          cord=np.random.rand(3)*np.min(prot.dimensions)#create a random position
-          dist=distances.distance_array(cord,prot.atoms.positions).min()#chek if the COM of the new position is above mindist
-          insert_try+=1 #increase try variable
-          if insert_try>1000:#check if i Tried to inser the molecule more than 1000 times to avoid infinte loop
-              sys.exit(f"Try to inser the molecule more than {insert_try} times, something wrong in the parameters") #exit in case of many insertion with an error
-      '''
-      print(f"moleculer will be inserted in {cord/10}, after {insert_try} attemps")#inform the user about the position of the placed molecule
-      posfile=os.path.join(outdir,"pos.dat")# define the path the position file
-      
-      with open(posfile,'w') as f:
-          ele=[f"{numb/10:>.2f}" for numb in cord.tolist()]#traslate the cordinate to a string /10 to convert Amstrong to nm, 
-          f.write(' '.join(ele))
-          f.write('\n')
-      outsys=os.path.join(outdir,"sys.pdb")#define system path
-      g_insert_molecule(f=outfile,o=outsys,ci=PDBLIG,ip=posfile)#insert the molecule in the random position defined before  
-      TopFold=os.path.join(outdir,"topol")#define the position of the topology file
 
-      if os.path.exists(TopFold): #chekc if the file exist
-          shutil.rmtree(TopFold)
-
-      shutil.copytree(TopFOLD,TopFold) #copy the topology folder in order to don't alterate the input
-      
-      if solvate:
-          print(f"I will solvate the system, and neutralyze it with {Saltconc} mol/L")
-          solvfile=os.path.join(outdir,"solv.pdb")# define the solvent file output
-          topfile=os.path.join(TopFold,"topol.top")#define the topology outputpaht
-          g_solvate(cp=outsys,p=topfile,o=solvfile)#add water to the system and modify the topology file
-          
-          with open("tmp.mdp","w") as f: #create a dummy mdp file
-              f.write("\n")
-          ionstprout=os.path.join(outdir,"ions.tpr")#define the output of the tpr file to add ions
-          g_grompp(MdpFile="tmp.mdp",TopolFile=topfile,CoordFile=solvfile,TprFile=ionstprout)#create the tpr file to add ions
-          os.remove("tmp.mdp")#remove the mdp file
-          os.remove(outsys)# remove the old system file
-          g_genion(s=ionstprout,neutral='yes',conc=Saltconc,replace='SOL',o=outsys,p=topfile) #add ions
-          print(f"The system has been solvated, placed in a cubic box with size {prot.dimensions[0:2]},\nsystem path {outsys}")
-
-      else:
-          print(f"The system has not been solvated, placed in a cubic box with size {str(prot.dimensions[0])},\nsystem path {outsys}")
-      return 0
-
-  def minimization_equilibration(MF_m,MF_e):
+  def minimization_equilibration(self):
       '''
-      this function make the minimization and equilibration process
+      This function make the minimization and equilibration process
       MF_m mdp file for the minimization
       MF_e mdp file for the equilibration phase
       '''
       print('\nMinimization ...', end='')
-      Gromacs_Tools.g_grompp(MdpFile=MF_m, TopolFile=os.path.join(outdir,"topol","topol.top"), CoordFile= os.path.join(outdir,"sys.pdb"), TprFile= os.path.join(minim,"min.tpr"),maxwarning='2')
-      if not os.path.exists(os.path.join(minim,"min.tpr")):
+      Gromacs_Tools.g_grompp(MdpFile=self.EmMdp.mdpfile_out, TopolFile=os.path.join(self.outdir,"topol","topol.top"), CoordFile= os.path.join(self.outdir,"sys.pdb"), TprFile= os.path.join(self.minim,"min.tpr"),maxwarning='2')
+      if not os.path.exists(os.path.join(self.minim,"min.tpr")):
           sys.exit("\nError during the minimization step - grompp doesn't work")
       
-      g_mdrun(OutputFile= os.path.join(minim,"min.trr"),xtcFile='', log_File= os.path.join(minim,"min.log") ,edr_File= os.path.join(minim,"min.edr") ,groFile= os.path.join(minim,"min.gro"), TprFile= os.path.join(minim,"min.tpr"),gpu=gpu)
-      if os.path.exists(os.path.join(minim,"min.trr")):
+      Gromacs_Tools.g_mdrun(OutputFile= os.path.join(self.minim,"min.trr"),xtcFile='', log_File= os.path.join(self.minim,"min.log") ,edr_File= os.path.join(self.minim,"min.edr") ,groFile= os.path.join(self.minim,"min.gro"), TprFile= os.path.join(self.minim,"min.tpr"),gpu=self.gpu)
+      if os.path.exists(os.path.join(self.minim,"min.trr")):
           print(' minimization completed')
       else:
           sys.exit("Error during the minimization step - mdrun doesn't work")
 
-      Gromacs_Tools.g_make_ndx(f=os.path.join(minim,"min.gro") , o= os.path.join(minim,"index.ndx"),Sel=["keep 0","rSOL|rLIG|rNA|rCL","name 1 solvent","!1","name 2 solute","\n"])
+      Gromacs_Tools.g_make_ndx(f=os.path.join(self.minim,"min.gro") , o= os.path.join(self.minim,"index.ndx"),Sel=["keep 0","rSOL|rLIG|rNA|rCL","name 1 solvent","!1","name 2 solute","\n"])
     # Gromacs_Tools.g_make_ndx(f=os.path.join(minim,"min.gro") , o= os.path.join(minim,"index.ndx"))
 
-      if not os.path.exists(os.path.join(minim,"index.ndx")):
+      if not os.path.exists(os.path.join(self.minim,"index.ndx")):
           sys.exit('Error during the creation of index file')
 
 
       print('Equilibration (NVT) ...', end='')
-      Gromacs_Tools.g_grompp(MdpFile=MF_e, TopolFile=os.path.join(outdir,"topol","topol.top"), CoordFile= os.path.join(minim,"min.gro"), IndexFile= os.path.join(minim,"index.ndx") , TprFile= os.path.join(equil,"md.tpr"),maxwarning='2')
-      if not os.path.exists(os.path.join(equil,"md.tpr")):
+      Gromacs_Tools.g_grompp(MdpFile=self.NptMdp.mdpfile_out, TopolFile=os.path.join(self.outdir,"topol","topol.top"), CoordFile= os.path.join(self.minim,"min.gro"), IndexFile= os.path.join(self.minim,"index.ndx") , TprFile= os.path.join(self.equil,"md.tpr"),maxwarning='2')
+      if not os.path.exists(os.path.join(self.equil,"md.tpr")):
           sys.exit("\nError during the equilibration step - grompp doesn't work")
 
-      g_mdrun(OutputFile= os.path.join(equil,"md.trr"),xtcFile='', log_File= os.path.join(equil,"md.log"), edr_File= os.path.join(equil,"md.edr"), groFile=os.path.join(equil,"md.gro"), TprFile=os.path.join(equil,"md.tpr"),gpu=gpu)
-      if os.path.exists(os.path.join(equil,"md.log")):
+      Gromacs_Tools.g_mdrun(OutputFile= os.path.join(self.equil,"md.trr"),xtcFile='', log_File= os.path.join(self.equil,"md.log"), edr_File= os.path.join(self.equil,"md.edr"), groFile=os.path.join(self.equil,"md.gro"), TprFile=os.path.join(self.equil,"md.tpr"),gpu=self.gpu)
+      if os.path.exists(os.path.join(self.equil,"md.log")):
           print(' Equilibration completed')
       else:
           sys.exit("Error during the equilibration step - mdrun doesn't work")
       return 0
+
+
+
+  def EmMdpFile(self,emMdpinput=False):
+    '''
+    deQuesta funzione crea il file di input della minimizzazione
+    '''
+    self.EmMdp=GmxMdp()
+    defaultEmparams={"integrator":"steep",
+                     "nsteps":"10000",
+                     "emtol":"1000",
+                     "emstep":"0.01"}
+    self.EmMdp.mdp_params.update(self.md_param)
+    self.EmMdp.mdp_params.update(defaultEmparams)
+    if emMdpinput:
+      self.EmMdp.read_mdp(emMdpinput)
+    self.EmMdp.write_mdp(mdpfile_out=self.mdp_fold+"01-em.mdp")
+
+  def NvtMdpFile(self,nvtMdpInput=False):
+    '''Questa funzione crea il file di input della minimizzazione
+    '''
+    self.NvtMdp=GmxMdp()
+    defaultNvtparams={"define":"-DPOSRES",
+                      "integrator":"md",
+                      'tinit':'0','dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'yes',
+                      'gen_temp':'300',
+                      'gen_seed':'-1'}
+    self.NvtMdp.mdp_params.update(self.md_param)
+    self.NvtMdp.mdp_params.update(defaultNvtparams)
+    if nvtMdpInput:
+      self.NvtMdp.read_mdp(nvtMdpInput)
+    self.NvtMdp.write_mdp(self.mdp_fold+"02-nvt.mdp")
+  
+  def NptMdpFile(self,nptMdpInput=False):
+
+    '''Questa funzione crea il file di input della Npt di equilibrazione
+    '''
+    self.NptMdp=GmxMdp()
+    defaultNptparams={"define":"-DPOSRES",
+                      "integrator":"md",
+                      'tinit':'0',
+                      'dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'no',
+                      'pcoupl':'Parrinello-Rahman',
+                      'pcoupltype':'isotropic',
+                      'nstpcouple':'-1',
+                      'tau_p':'5.0',
+                      'compressibility':'4.5e-5',
+                      'ref_p':'1.0'}
+    self.NptMdp.mdp_params.update(self.md_param)
+    self.NptMdp.mdp_params.update(defaultNptparams)
+    if nptMdpInput:
+      self.NptMdp.read_mdp(nptMdpInput)
+    self.NptMdp.write_mdp(self.mdp_fold+"03-npt.mdp")
+
+
+  def MdMdpFile(self,MdMdpInput=False):
+    '''Questa funzione crea il file di input della Production
+    '''
+    self.MdMdp=GmxMdp()
+    defaultMdparams={"integrator":"md",
+                      'tinit':'0',
+                      'dt':'0.002',
+                      'nsteps':'300000',
+                      'tcoupl':'V-rescale',
+                      'nsttcouple':'-1',
+                      'nh-chain-length':'10',
+                      'tc-grps':'System',
+                      'tau_t':'0.1',
+                      'ref_t':'300',
+                      'gen_vel':'no',
+                      'pcoupl':'Parrinello-Rahman',
+                      'pcoupltype':'isotropic',
+                      'nstpcouple':'-1',
+                      'tau_p':'5.0',
+                      'compressibility':'4.5e-5',
+                      'ref_p':'1.0',
+                      'nstxout':'50000',
+                      'nstvout':'50000',
+                      'nstfout':'50000',
+                      'nstlog':'500',
+                      'nstenergy':'500'}
+    self.MdMdp.mdp_params.update(self.md_param)
+    self.MdMdp.mdp_params.update(defaultMdparams)
+    if MdMdpInput:
+      self.NptMdp.read_mdp(MdMdpInput)
+    self.MdMdp.write_mdp(self.mdp_fold+"04-md.mdp")
 
   def CreateWorkingFold(self):
     self.workfold="sumd"#define workfold folder --> folder che conterrà ogni operazione dell'algoritmo
@@ -472,105 +497,11 @@ class SuMD:
     self.mdp_fold= os.path.join(self.outdir,"mdp") #define mdp folder --> folder che conterrà gli mdp
     if not os.path.exists(self.mdp_fold): #chekc folder exists
       os.mkdir(self.mdp_fold) #in case doesn't exist create the directory
-  
-  def EmMdpFile(self,emMdpinput=False):
-    '''
-    deQuesta funzione crea il file di input della minimizzazione
-    '''
-    self.EmMdp=GmxMdp()
-    defaultEmparams={"integrator":"steep",
-                     "nsteps":"10000",
-                     "emtol":"1000",
-                     "emstep":"0.01"}
-    self.EmMdp.mdp_params.update(self.md_param)
-    self.EmMdp.mdp_params.update(defaultEmparams)
-    if emMdpinput:
-      self.emMdp.read_mdp(emMdpinput)
-    self.EmMdp.write_mdp(self.mdp_fold+"01-em.mdp")
-
-  def NvtMdpFile(self,nvtMdpInput=False):
-    '''Questa funzione crea il file di input della minimizzazione
-    '''
-    self.NvtMdp=GmxMdp()
-    defaultNvtparams={"define":"-DPOSRES",
-                      "integrator":"md",
-                      'tinit':'0','dt':'0.002',
-                      'nsteps':'300000',
-                      'tcoupl':'V-rescale',
-                      'nsttcouple':'-1',
-                      'nh-chain-length':'10',
-                      'tc-grps':'System',
-                      'tau_t':'0.1',
-                      'ref_t':'300',
-                      'gen_vel':'yes',
-                      'gen_temp':'300',
-                      'gen_seed':'-1'}
-    self.NvtMdp.mdp_params.update(self.md_param)
-    self.NvtMdp.mdp_params.update(defaultNvtparams)
-    if nvtMdpInput:
-      self.NvtMdp.read_mdp(nvtMdpInput)
-    self.NvtMdp.write_mdp(self.mdp_fold+"02-nvt.mdp")
-  
-  
-  def NptMdpFile(self,nptMdpinput=False):
-    '''Questa funzione crea il file di input della Npt di equilibrazione
-    '''
-    self.NptMdp=GmxMdp()
-    defaultNptparams={"define":"-DPOSRES",
-                      "integrator":"md",
-                      'tinit':'0',
-                      'dt':'0.002',
-                      'nsteps':'300000',
-                      'tcoupl':'V-rescale',
-                      'nsttcouple':'-1',
-                      'nh-chain-length':'10',
-                      'tc-grps':'System',
-                      'tau_t':'0.1',
-                      'ref_t':'300',
-                      'gen_vel':'no',
-                      'pcoupl':'Parrinello-Rahman',
-                      'pcoupltype':'isotropic',
-                      'nstpcouple':'-1',
-                      'tau_p':'5.0',
-                      'compressibility':'4.5e-5',
-                      'ref_p':'1.0'}
-    self.NptMdp.mdp_params.update(self.md_param)
-    self.NptMdp.mdp_params.update(defaultNptparams)
-    if nptMdpInput:
-      self.NptMdp.read_mdp(nptMdpInput)
-    self.NptMdp.write_mdp(self.mdp_fold+"03-npt.mdp")
-
-  def MdMdpFile(self,MdMdpInput=False):
-    '''Questa funzione crea il file di input della Production
-    '''
-    self.MdMdp=GmxMdp()
-    defaultMdparams={"integrator":"md",
-                      'tinit':'0',
-                      'dt':'0.002',
-                      'nsteps':'300000',
-                      'tcoupl':'V-rescale',
-                      'nsttcouple':'-1',
-                      'nh-chain-length':'10',
-                      'tc-grps':'System',
-                      'tau_t':'0.1',
-                      'ref_t':'300',
-                      'gen_vel':'no',
-                      'pcoupl':'Parrinello-Rahman',
-                      'pcoupltype':'isotropic',
-                      'nstpcouple':'-1',
-                      'tau_p':'5.0',
-                      'compressibility':'4.5e-5',
-                      'ref_p':'1.0',
-                      'nstxout':'50000',
-                      'nstvout':'50000',
-                      'nstfout':'50000',
-                      'nstlog':'500',
-                      'nstenergy':'500'}
-    self.MdMdp.mdp_params.update(self.md_param)
-    self.MdMdp.mdp_params.update(defaultMdparams)
-    if MdMdpInput:
-      self.NptMdp.read_mdp(MdMdpInput)
-    self.MdMdp.write_mdp(self.mdp_fold+"04-md.mdp")
+    
+    #FORSE NON SERVE PIU' E' STATO SPOSTATO NELLA FUNZIONE BuildGeometry Eventualmente da rimuovere
+    # self.top_fold=os.path.join(self.outdir,"topol") #define topol folder --> folder che conterrà i file di topologia
+    # if not os.path.exists(self.topf_old): #chekc folder exists
+    #   os.mkdir(self.topfold) #in case doesn't exist create the directory
 
   def run(self):
     #SuMD params inizialization
@@ -594,7 +525,7 @@ class SuMD:
     counter1=0 # counter that is incremented by 1 and compared with counter1t every time there is a failed step in the SuMD run
     c_step=0 # counters that allow us to determine when a SuMD run step is productive
     k_step=0 # counters that allow us to determine when a SuMD run step is productive
-    d_cm_vector=np.zeros(self.sumd_param['n'])# vector in which the distances of the com taken in the 5 steps are entered within each short MD simulation during the SuMD run
+    d_cm_vector=np.zeros(self.sumd_param['n_sample'])# vector in which the distances of the com taken in the 5 steps are entered within each short MD simulation during the SuMD run
     d_cm_out=0 # final distance value dcm stored at the end of the short MD simulations that occur once supervision is stopped
     counter02=0 # counter that is updated and compared with ct02 every time that  dcm is between 0 and 2 Å
     counter25=0 # counter that is updated and compared with ct25 every time that dcm is between 2 and 5 Å
@@ -604,6 +535,13 @@ class SuMD:
     corrette = 1
     fallimento = 1 #tiene conto delle volte in cui è stato necessario ricominciare la simulazione
     
+    self.CreateWorkingFold() #Creo le cartelle di lavoro
+
+
+    self.EmMdpFile() #Creo il file di input per la minimizzazione
+    self.NvtMdpFile() #Creo il file di input per l'equilibrazione NVT
+    self.NptMdpFile() #Creo il file di input per l'equilibrazione NPT
+    self.MdMdpFile() #Creo il file di input per la simulazione MD
 
     #Definition folders
     act_sim=self.act_sim
@@ -616,9 +554,9 @@ class SuMD:
     while flag == 1:
       if prima_volta == 1: #Se è la prima volta che si esegue lo script, allora è necessario generare un ambiente 
         print("Creation of the box containing protein and ligand\n")
-        BuildGeometry(self.PDBPROT,self.PDBLIG,self.TopFOLD,solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
+        self.BuildGeometry(d=self.distance_from_edge,mindist=self.distance_from_pocket)
         
-        minimization_equilibration(MF_m = self.EmMdp.mdpfile_out, MF_e = self.NvtMdp.mdpfile_out)
+        self.minimization_equilibration()
         shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
         prima_volta = 0
         cambiare_velocità = 0 # la velocità degli atomi della prima simulazione non deve essere cambiata 
@@ -640,7 +578,7 @@ class SuMD:
           self.MdMdp.mdp_params['continuation']='no'
           self.MdMdp.write_mdp(mdp_fold+'04-md.mdp')
           print(f"MD simulation #{corrette} - change of velocity ...", end='')
-          m_primo,dcm_vector = SuMdStep(self.sumd_param['n'],MF=self.MdMdp.mdpfile_out,append=True)
+          m_primo,dcm_vector = self.SuMdStep(self.sumd_param['n'],MF=self.MdMdp.mdpfile_out,append=True)
         if m_primo > 0: #Non produttivo
           cambiare_velocità = 1
           print(f" The step was not productive (Attempt {t_step})")
@@ -661,8 +599,8 @@ class SuMD:
           t_step = 0
           corrette = 1 #bisogna ricominciare dall'inizio
           cambiare_velocità = 0
-          BuildGeometry(self.PDBPROT,self.PDBLIG,self.TopFOLD,solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
-          minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
+          self.BuildGeometry(solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket)
+          self.minimization_equilibration(MF_m = mdp_em, MF_e = mdp_nvt)
           shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
           shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
           shutil.rmtree(corr_sim), os.mkdir(corr_sim) #La cartella delle vecchie simulazioni corrette deve essere eliminata dato che si ricomincia dall'inizio
@@ -721,7 +659,7 @@ class SuMD:
           k_step = 0
           cambiare_velocità = 1 #bisogna cambiare geometria e velocità
 
-          BuildGeometry(self.PDBPROT,self.PDBLIG,self.TopFOLD,solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
+          BuildGeometry(solvate=True,d=self.distance_from_edge,dist=self.distance_from_pocket,pocket=self.POCKET)
           minimization_equilibration( MF_m = self.EmMdp.mdpfile_out, MF_e = self.NvtMdp.mdpfile_out)
           shutil.rmtree(act_sim), shutil.copytree(equil, act_sim) #Copio l'output dell'equalizzazione nella cartella actual_simulation
           shutil.copytree(corr_sim,os.path.join(fal_sim,f"suMD{fallimento}")) #tengo conto del fallimenti e salvo tutto in fal_sim
@@ -786,7 +724,7 @@ if __name__=="__main__":
   start_time=time.localtime()
 
   # Creare la scritta stilizzata
-  text_sumd = pyfiglet.figlet_format("suMD", font="slant", width=80, justify="center")
+  text_sumd = pyfiglet.figlet_format("SuMD", font="slant", width=80, justify="center")
   # Definire la larghezza della cornice
   border_width = 80
 
@@ -797,8 +735,10 @@ if __name__=="__main__":
   centered_text = text_sumd.center(border_width)
 
   # Stampare la scritta con la cornice centrata
-  print(border + centered_text + '\n' + border)
+  '''print(border + centered_text + '\n' + border)
   print(time.asctime(start_time))
   args=parse_options()
  
-  SuMD(args.pdb,args.pocket,args.PdbLig,args.TopFold)
+  SuMD(args.pdb,args.pocket,args.PdbLig,args.TopFold)'''
+  sumd=SuMD(PDBPROT="PDB/3RFM/0_sys/3RFM.gro",PDBLIG="PDB/LIG/LIG.pdb",TopFOLD="PDB/3RFM_LIG/topol",POCKET='resid 267 or resid 252 or resid 264 or resid 256 or resid 174')
+  sumd.run()

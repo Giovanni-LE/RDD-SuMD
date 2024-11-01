@@ -44599,9 +44599,7 @@ Protein in water
 ; Compound        #mols
 Protein             1
 LIG		1
-SOL         41062
-NA               119
-CL               127
+
 
 
 
